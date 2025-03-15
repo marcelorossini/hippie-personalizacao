@@ -1,0 +1,117 @@
+/* Desabilita a seleção de texto em todo o site */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Layout principal: menu lateral + seção de design */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Em mobile, as seções serão empilhadas */
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+  }
+  .layers-panel {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .design-section {
+    width: 100%;
+  }
+  .tshirt-base, .design-area {
+    width: 100%;
+    max-width: 300px;
+  }
+  .design-area {
+    height: auto;
+  }
+}
+
+/* Painel lateral para listar camadas */
+.layers-panel {
+  width: 200px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.layers-panel h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+#layers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#layers-list li {
+  padding: 5px 8px;
+  margin-bottom: 4px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+#layers-list li.selected {
+  background-color: #f0f0f0;
+  border-color: #aaa;
+}
+
+/* Seção de design/camiseta */
+.design-section {
+  flex: 1;
+  text-align: center;
+}
+.controls {
+  margin-bottom: 10px;
+}
+
+/* Camiseta e área útil */
+.tshirt-container {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+.tshirt-base {
+  width: 300px;
+}
+/* A "design-area" será onde colocamos o Fabric Canvas */
+.design-area {
+  margin: 0 auto;
+  width: 300px;
+  height: 400px;
+  border: 1px solid red;
+  position: relative;
+}
+
+/* Menu de contexto personalizado */
+.context-menu {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  display: none;
+  z-index: 9999;
+}
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px;
+}
+.context-menu ul li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.context-menu ul li:hover {
+  background-color: #eee;
+}
