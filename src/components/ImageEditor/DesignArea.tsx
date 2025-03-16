@@ -223,7 +223,11 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
             id="design-area"
             ref={designAreaRef}
             className="design-area absolute top-0 left-0 w-full h-full border overflow-hidden select-none"
-            onClick={() => setSelectedLayerId(null)}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedLayerId(null);
+              }
+            }}
           >
             {layers.map(layer => (
               <DesignItem

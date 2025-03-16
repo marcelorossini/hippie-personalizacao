@@ -33,12 +33,12 @@ const DesignItem: React.FC<DesignItemProps> = ({
         if (containerRef.current) {
             // Aplica as funcionalidades de drag, resize, rotate e pinch‑zoom
             makeDraggable(containerRef.current, designAreaRef);
-            const imgEl = containerRef.current.querySelector('img');
-            const resizeHandleEl = containerRef.current.querySelector('.resize-handle');
+            const imgEl = containerRef.current.querySelector('img') as HTMLImageElement;
+            const resizeHandleEl = containerRef.current.querySelector('.resize-handle') as HTMLElement;
             if (imgEl && resizeHandleEl) {
                 makeResizable(containerRef.current, imgEl, resizeHandleEl, designAreaRef);
             }
-            const rotateHandleEl = containerRef.current.querySelector('.rotate-handle');
+            const rotateHandleEl = containerRef.current.querySelector('.rotate-handle') as HTMLElement;
             if (rotateHandleEl) {
                 makeRotatable(containerRef.current, rotateHandleEl);
             }
@@ -100,8 +100,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
     return (
         <div
             ref={containerRef}
-            className={`design-item absolute cursor-move top-12 left-12 transform origin-center border-3 border-dashed ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'
-                }`}
+            className="design-item absolute cursor-move top-12 left-12 transform origin-center"
             data-rotate-angle="0"
             data-layer-id={id}
             onMouseDown={handleMouseDown}
@@ -110,15 +109,25 @@ const DesignItem: React.FC<DesignItemProps> = ({
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
         >
-            <img
-                src={imgSrc}
-                alt="Design"
-                draggable={false}
-                className="design-image select-none"
-                style={{ height: '200px', width: 'auto' }}
-            />
-            <ResizeHandle />
-            <RotateHandle />
+            {/* Borda de seleção */}
+            <div className={`absolute inset-0 border-3 border-dashed pointer-events-none ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'}`} />
+            
+            {/* Conteúdo da camada */}
+            <div className="relative">
+                <img
+                    src={imgSrc}
+                    alt="Design"
+                    draggable={false}
+                    className="design-image select-none"
+                    style={{ height: '200px', width: 'auto' }}
+                />
+                {isSelected && (
+                    <>
+                        <ResizeHandle />
+                        <RotateHandle />
+                    </>
+                )}
+            </div>
         </div>
     );
 };
