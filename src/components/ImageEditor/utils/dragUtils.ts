@@ -243,8 +243,6 @@ export const makePinchZoomable = (container: HTMLElement, image: HTMLImageElemen
     newHeight = newWidth / aspectRatio;
     image.style.width = newWidth + 'px';
     image.style.height = newHeight + 'px';
-    container.style.width = newWidth + 'px';
-    container.style.height = newHeight + 'px';
 
     const currentPinchAngle = Math.atan2(
       touch2.clientY - touch1.clientY,

@@ -39,14 +39,14 @@ const DesignItem: React.FC<DesignItemProps> = ({
             makeDraggable(containerRef.current, designAreaRef);
             const imgEl = containerRef.current.querySelector('img');
             const resizeHandleEl = containerRef.current.querySelector('.resize-handle');
-            if (imgEl && resizeHandleEl) {
+            if (imgEl instanceof HTMLImageElement && resizeHandleEl instanceof HTMLElement) {
                 makeResizable(containerRef.current, imgEl, resizeHandleEl, designAreaRef);
             }
             const rotateHandleEl = containerRef.current.querySelector('.rotate-handle');
-            if (rotateHandleEl) {
+            if (rotateHandleEl instanceof HTMLElement) {
                 makeRotatable(containerRef.current, rotateHandleEl);
             }
-            if (imgEl) {
+            if (imgEl instanceof HTMLImageElement) {
                 makePinchZoomable(containerRef.current, imgEl, designAreaRef);
             }
         }
@@ -104,7 +104,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
     return (
         <div
             ref={containerRef}
-            className={`design-item absolute cursor-move top-12 left-12 transform origin-center border-3 border-dashed ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'
+            className={`design-item absolute cursor-move top-12 left-12 transform origin-center border-3 border-dashed inline-flex ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'
                 }`}
             data-rotate-angle="0"
             data-layer-id={id}
@@ -118,7 +118,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 src={imgSrc}
                 alt="Design"
                 draggable={false}
-                className="design-image select-none"
+                className="design-image select-none w-auto h-auto"
                 style={{ height: '200px', width: 'auto' }}
             />
             <ResizeHandle />
