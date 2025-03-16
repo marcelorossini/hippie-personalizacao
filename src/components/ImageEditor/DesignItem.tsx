@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ResizeHandle, RotateHandle } from './Handles';
 import {
     makeDraggable,
@@ -32,6 +32,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const longPressTimerRef = useRef<number | null>(null);
+    const [designAreaSize, setDesignAreaSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     useEffect(() => {
         if (containerRef.current) {
@@ -49,6 +50,10 @@ const DesignItem: React.FC<DesignItemProps> = ({
             if (imgEl instanceof HTMLImageElement) {
                 makePinchZoomable(containerRef.current, imgEl, designAreaRef);
             }
+            setDesignAreaSize({
+                width: designAreaRef.current?.clientWidth || 0,
+                height: designAreaRef.current?.clientHeight || 0
+            })
         }
     }, [designAreaRef]);
 
@@ -119,7 +124,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 alt="Design"
                 draggable={false}
                 className="design-image select-none w-auto h-auto"
-                style={{ height: '200px', width: 'auto' }}
+                style={{ height: `${designAreaSize.width * 0.7}px`, width: 'auto' }}
             />
             <ResizeHandle />
             <RotateHandle />
