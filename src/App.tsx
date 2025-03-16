@@ -1,8 +1,10 @@
 import React from 'react';
-import ImageEditor from './components/ImageEditor';
+import ImageEditor from './components/features/ImageEditor';
 
 function App() {
- return (<ImageEditor/>)
+ return (<>
+ <ImageEditor/>
+ </>)
 }
 
 export default App;

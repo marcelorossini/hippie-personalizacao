@@ -1,14 +1,7 @@
-import React, { useState } from 'react';
-import LayersPanel from './LayersPanel';
-import DesignArea from './DesignArea';
+import { useState } from 'react';
+import { Layer } from '../types/layer';
 
-export interface Layer {
-  id: string;
-  name: string;
-  imgSrc: string;
-}
-
-const App: React.FC = () => {
+export const useLayerManager = () => {
   const [layers, setLayers] = useState<Layer[]>([]);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
 
@@ -61,26 +54,20 @@ const App: React.FC = () => {
     setSelectedLayerId(null);
   };
 
-  return (
-    <div className="w-full h-full flex flex-col md:flex-row gap-5 p-5">
-      <LayersPanel
-        layers={layers}
-        selectedLayerId={selectedLayerId}
-        onSelectLayer={(id) => setSelectedLayerId(id)}
-        moveLayerForward={moveLayerForward}
-        moveLayerBackward={moveLayerBackward}
-        sendLayerToFront={sendLayerToFront}
-        sendLayerToBack={sendLayerToBack}
-        removeLayer={removeLayer}
-      />
-      <DesignArea
-        layers={layers}
-        setLayers={setLayers}
-        selectedLayerId={selectedLayerId}
-        setSelectedLayerId={setSelectedLayerId}
-      />
-    </div>
-  );
-};
+  const addLayer = (layer: Layer) => {
+    setLayers(prev => [...prev, layer]);
+  };
 
-export default App;
+  return {
+    layers,
+    setLayers,
+    selectedLayerId,
+    setSelectedLayerId,
+    moveLayerForward,
+    moveLayerBackward,
+    sendLayerToFront,
+    sendLayerToBack,
+    removeLayer,
+    addLayer,
+  };
+}; 

@@ -4,8 +4,8 @@ import {
     makeDraggable,
     makeResizable,
     makeRotatable,
-    makePinchZoomable,
-} from './utils/dragUtils';
+    makePinchZoomable
+} from '../utils/dragUtils';
 
 interface DesignItemProps {
     id: string;
