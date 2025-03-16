@@ -33,6 +33,26 @@ const DesignItem: React.FC<DesignItemProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const longPressTimerRef = useRef<number | null>(null);
     const [designAreaSize, setDesignAreaSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
+    const [position, setPosition] = useState<{ top: number, left: number }>({ top: 0, left: 0 });
+
+    useEffect(() => {
+        if (designAreaRef.current) {
+            const designArea = designAreaRef.current;
+            const newWidth = designArea.clientWidth;
+            const newHeight = designArea.clientHeight;
+            
+            setDesignAreaSize({
+                width: newWidth,
+                height: newHeight
+            });
+
+            // Calcula a posição central
+            setPosition({
+                top: (newHeight - (newWidth * 0.7)) / 2,
+                left: newWidth / 4  // Centraliza horizontalmente considerando que a imagem terá width: auto
+            });
+        }
+    }, [designAreaRef]);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -50,10 +70,6 @@ const DesignItem: React.FC<DesignItemProps> = ({
             if (imgEl instanceof HTMLImageElement) {
                 makePinchZoomable(containerRef.current, imgEl, designAreaRef);
             }
-            setDesignAreaSize({
-                width: designAreaRef.current?.clientWidth || 0,
-                height: designAreaRef.current?.clientHeight || 0
-            })
         }
     }, [designAreaRef]);
 
@@ -109,8 +125,14 @@ const DesignItem: React.FC<DesignItemProps> = ({
     return (
         <div
             ref={containerRef}
-            className={`design-item absolute cursor-move top-12 left-12 transform origin-center border-3 border-dashed inline-flex ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'
-                }`}
+            style={{
+                position: 'absolute',
+                top: `${position.top}px`,
+                left: `${position.left}px`
+            }}
+            className={`design-item cursor-move transform origin-center border-3 border-dashed inline-flex ${
+                isSelected ? 'border-blue-500 z-50' : 'border-transparent'
+            }`}
             data-rotate-angle="0"
             data-layer-id={id}
             onMouseDown={handleMouseDown}
