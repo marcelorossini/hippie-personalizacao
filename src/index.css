@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
-:root {
-  
-}
+:root {}
 
 /* reset.css */
 html,
@@ -16,4 +14,12 @@ body {
 #root {
   width: 100%;
   height: 100%;
+}
+
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
