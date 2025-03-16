@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import LayersPanel from './LayersPanel';
 import DesignArea from './DesignArea';
 
-// Define a interface para as camadas
 export interface Layer {
   id: string;
   name: string;
@@ -14,11 +13,11 @@ const App: React.FC = () => {
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
 
   return (
-    <div className="container">
+    <div className="w-full h-full flex flex-col md:flex-row gap-5 p-5">
       <LayersPanel
         layers={layers}
         selectedLayerId={selectedLayerId}
-        onSelectLayer={(id: React.SetStateAction<string | null>) => setSelectedLayerId(id)}
+        onSelectLayer={(id) => setSelectedLayerId(id)}
       />
       <DesignArea
         layers={layers}
