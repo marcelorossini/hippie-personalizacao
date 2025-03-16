@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import DesignItem from './DesignItem';
 import heic2any from 'heic2any';
 
@@ -12,8 +12,8 @@ export interface Layer {
 interface DesignAreaProps {
   layers: Layer[];
   setLayers: React.Dispatch<React.SetStateAction<Layer[]>>;
-  selectedLayerId: React.Dispatch<React.SetStateAction<Layer[]>>;
-  setSelectedLayerId: React.Dispatch<React.SetStateAction<Layer[]>>;
+  selectedLayerId: string | null;
+  setSelectedLayerId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLayerId, setSelectedLayerId }) => {
@@ -97,6 +97,46 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
     const [layerObj] = newLayers.splice(idx, 1);
     newLayers.unshift(layerObj);
     setLayers(newLayers);
+    hideContextMenu();
+  };
+
+  const sendLayerToFront = () => {
+    if (!selectedLayerId) return;
+    const idx = layers.findIndex(l => l.id === selectedLayerId);
+    if (idx < 0) return;
+    const newLayers = [...layers];
+    const [layerObj] = newLayers.splice(idx, 1);
+    newLayers.push(layerObj);
+    setLayers(newLayers);
+    hideContextMenu();
+  };
+
+  const moveLayerForward = () => {
+    if (!selectedLayerId) return;
+    const idx = layers.findIndex(l => l.id === selectedLayerId);
+    if (idx < 0 || idx === layers.length - 1) return;
+    const newLayers = [...layers];
+    const temp = newLayers[idx];
+    newLayers[idx] = newLayers[idx + 1];
+    newLayers[idx + 1] = temp;
+    setLayers(newLayers);
+  };
+
+  const moveLayerBackward = () => {
+    if (!selectedLayerId) return;
+    const idx = layers.findIndex(l => l.id === selectedLayerId);
+    if (idx <= 0) return;
+    const newLayers = [...layers];
+    const temp = newLayers[idx];
+    newLayers[idx] = newLayers[idx - 1];
+    newLayers[idx - 1] = temp;
+    setLayers(newLayers);
+  };
+
+  const removeLayer = () => {
+    if (!selectedLayerId) return;
+    setLayers(prev => prev.filter(layer => layer.id !== selectedLayerId));
+    setSelectedLayerId(null);
     hideContextMenu();
   };
 
@@ -239,6 +279,8 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
                 selectLayer={selectLayer}
                 showContextMenu={showContextMenu}
                 sendLayerToBack={sendLayerToBack}
+                sendLayerToFront={sendLayerToFront}
+                removeLayer={removeLayer}
               />
             ))}
           </div>
@@ -248,9 +290,15 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
           ref={contextMenuRef}
           className="absolute bg-white border border-gray-300 hidden z-50"
         >
-          <ul>
-            <li onClick={sendLayerToBack} className="py-1 px-2 cursor-pointer hover:bg-gray-100">
+          <ul className="py-1">
+            <li onClick={sendLayerToFront} className="py-1 px-3 cursor-pointer hover:bg-gray-100">
+              Enviar para frente
+            </li>
+            <li onClick={sendLayerToBack} className="py-1 px-3 cursor-pointer hover:bg-gray-100">
               Enviar para trás
+            </li>
+            <li onClick={removeLayer} className="py-1 px-3 cursor-pointer hover:bg-gray-100 text-red-600">
+              Remover camada
             </li>
           </ul>
         </div>

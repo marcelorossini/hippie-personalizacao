@@ -10,11 +10,13 @@ import {
 interface DesignItemProps {
     id: string;
     imgSrc: string;
-    designAreaRef: React.RefObject<HTMLDivElement>;
+    designAreaRef: React.RefObject<HTMLDivElement | null>;
     isSelected: boolean;
     selectLayer: (layerId: string) => void;
     showContextMenu: (x: number, y: number) => void;
     sendLayerToBack: () => void;
+    sendLayerToFront: () => void;
+    removeLayer: () => void;
 }
 
 const DesignItem: React.FC<DesignItemProps> = ({
@@ -25,6 +27,8 @@ const DesignItem: React.FC<DesignItemProps> = ({
     selectLayer,
     showContextMenu,
     sendLayerToBack,
+    sendLayerToFront,
+    removeLayer,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const longPressTimerRef = useRef<number | null>(null);
@@ -33,12 +37,12 @@ const DesignItem: React.FC<DesignItemProps> = ({
         if (containerRef.current) {
             // Aplica as funcionalidades de drag, resize, rotate e pinch‑zoom
             makeDraggable(containerRef.current, designAreaRef);
-            const imgEl = containerRef.current.querySelector('img') as HTMLImageElement;
-            const resizeHandleEl = containerRef.current.querySelector('.resize-handle') as HTMLElement;
+            const imgEl = containerRef.current.querySelector('img');
+            const resizeHandleEl = containerRef.current.querySelector('.resize-handle');
             if (imgEl && resizeHandleEl) {
                 makeResizable(containerRef.current, imgEl, resizeHandleEl, designAreaRef);
             }
-            const rotateHandleEl = containerRef.current.querySelector('.rotate-handle') as HTMLElement;
+            const rotateHandleEl = containerRef.current.querySelector('.rotate-handle');
             if (rotateHandleEl) {
                 makeRotatable(containerRef.current, rotateHandleEl);
             }
@@ -100,7 +104,8 @@ const DesignItem: React.FC<DesignItemProps> = ({
     return (
         <div
             ref={containerRef}
-            className="design-item absolute cursor-move top-12 left-12 transform origin-center"
+            className={`design-item absolute cursor-move top-12 left-12 transform origin-center border-3 border-dashed ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'
+                }`}
             data-rotate-angle="0"
             data-layer-id={id}
             onMouseDown={handleMouseDown}
@@ -109,25 +114,15 @@ const DesignItem: React.FC<DesignItemProps> = ({
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
         >
-            {/* Borda de seleção */}
-            <div className={`absolute inset-0 border-3 border-dashed pointer-events-none ${isSelected ? 'border-blue-500 z-50' : 'border-transparent'}`} />
-            
-            {/* Conteúdo da camada */}
-            <div className="relative">
-                <img
-                    src={imgSrc}
-                    alt="Design"
-                    draggable={false}
-                    className="design-image select-none"
-                    style={{ height: '200px', width: 'auto' }}
-                />
-                {isSelected && (
-                    <>
-                        <ResizeHandle />
-                        <RotateHandle />
-                    </>
-                )}
-            </div>
+            <img
+                src={imgSrc}
+                alt="Design"
+                draggable={false}
+                className="design-image select-none"
+                style={{ height: '200px', width: 'auto' }}
+            />
+            <ResizeHandle />
+            <RotateHandle />
         </div>
     );
 };

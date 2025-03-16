@@ -6,7 +6,7 @@ export const getPointer = (e: MouseEvent | TouchEvent): MouseEvent | Touch => {
   return e as MouseEvent;
 };
 
-export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefObject<HTMLElement>) => {
+export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefObject<HTMLElement | null>) => {
   let isDragging = false;
   let startX = 0, startY = 0;
   let startContainerWidth = 0;
@@ -70,7 +70,7 @@ export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefOb
   container.addEventListener('touchstart', dragStart, { passive: false });
 };
 
-export const makeResizable = (container: HTMLElement, image: HTMLImageElement, handle: HTMLElement, designAreaRef: React.RefObject<HTMLElement>) => {
+export const makeResizable = (container: HTMLElement, image: HTMLImageElement, handle: HTMLElement, designAreaRef: React.RefObject<HTMLElement | null>) => {
   let isResizing = false;
   let startX = 0;
   let startWidth = 0;
@@ -146,8 +146,10 @@ export const makeRotatable = (container: HTMLElement, handle: HTMLElement) => {
     isRotating = true;
     initialAngle = parseFloat(container.dataset.rotateAngle || '0');
     const rect = container.getBoundingClientRect();
-    center.x = rect.left + rect.width / 2;
-    center.y = rect.top + rect.height / 2;
+    center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
     const pointer = getPointer(e);
     startAngle = getAngle(pointer.clientX, pointer.clientY, center.x, center.y);
 
@@ -165,8 +167,8 @@ export const makeRotatable = (container: HTMLElement, handle: HTMLElement) => {
     e.preventDefault();
     const pointer = getPointer(e);
     const currentAngle = getAngle(pointer.clientX, pointer.clientY, center.x, center.y);
-    let delta = currentAngle - startAngle;
-    let newAngle = initialAngle + delta;
+    const delta = currentAngle - startAngle;
+    const newAngle = initialAngle + delta;
     container.dataset.rotateAngle = String(newAngle);
     container.style.transform = `rotate(${newAngle}deg)`;
   };
@@ -186,7 +188,7 @@ export const makeRotatable = (container: HTMLElement, handle: HTMLElement) => {
   handle.addEventListener('touchstart', rotateStart, { passive: false });
 };
 
-export const makePinchZoomable = (container: HTMLElement, image: HTMLImageElement, designAreaRef: React.RefObject<HTMLElement>) => {
+export const makePinchZoomable = (container: HTMLElement, image: HTMLImageElement, designAreaRef: React.RefObject<HTMLElement | null>) => {
   let isPinching = false;
   let initialDistance = 0;
   let initialWidth = 0;
@@ -230,8 +232,8 @@ export const makePinchZoomable = (container: HTMLElement, image: HTMLImageElemen
     let newHeight = initialHeight * scale;
     newWidth = Math.max(newWidth, 20);
     newHeight = Math.max(newHeight, 20);
-    let currentLeft = parseFloat(container.style.left) || container.offsetLeft;
-    let currentTop = parseFloat(container.style.top) || container.offsetTop;
+    const currentLeft = parseFloat(container.style.left) || container.offsetLeft;
+    const currentTop = parseFloat(container.style.top) || container.offsetTop;
     let maxWidth = newWidth, maxHeight = newHeight;
     if (designAreaRef.current) {
       maxWidth = designAreaRef.current.offsetWidth - currentLeft;
