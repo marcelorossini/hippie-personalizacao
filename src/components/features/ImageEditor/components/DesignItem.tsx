@@ -41,18 +41,56 @@ const DesignItem: React.FC<DesignItemProps> = ({
             const newWidth = designArea.clientWidth;
             const newHeight = designArea.clientHeight;
             
-            setDesignAreaSize({
-                width: newWidth,
-                height: newHeight
-            });
-
-            // Calcula a posição central
-            setPosition({
-                top: (newHeight - (newWidth * 0.7)) / 2,
-                left: newWidth / 4  // Centraliza horizontalmente considerando que a imagem terá width: auto
-            });
+            // Calcula a altura máxima permitida (70% da altura da área de design)
+            const maxHeight = newHeight * 0.7;
+            
+            // Carrega a imagem para obter suas dimensões originais
+            const img = new Image();
+            img.src = imgSrc;
+            
+            img.onload = () => {
+                // Calcula a proporção da imagem
+                const imageAspectRatio = img.width / img.height;
+                
+                // Calcula as dimensões finais mantendo a proporção
+                let finalHeight = maxHeight;
+                let finalWidth = finalHeight * imageAspectRatio;
+                
+                // Se a largura calculada exceder a largura da área, recalcula baseado na largura
+                if (finalWidth > newWidth) {
+                    finalWidth = newWidth;
+                    finalHeight = finalWidth / imageAspectRatio;
+                    
+                    // Se ainda assim a altura for maior que 70%, reduz para 50%
+                    if (finalHeight > maxHeight) {
+                        finalHeight = newHeight * 0.5;
+                        finalWidth = finalHeight * imageAspectRatio;
+                    }
+                }
+                
+                // Calcula a posição central
+                const topPosition = (newHeight - finalHeight) / 2;
+                const leftPosition = (newWidth - finalWidth) / 2;
+                
+                setDesignAreaSize({
+                    width: newWidth,
+                    height: newHeight
+                });
+                
+                setPosition({
+                    top: topPosition,
+                    left: leftPosition
+                });
+                
+                // Atualiza o tamanho da imagem
+                const imageElement = containerRef.current?.querySelector('.design-image') as HTMLImageElement;
+                if (imageElement) {
+                    imageElement.style.height = `${finalHeight}px`;
+                    imageElement.style.width = `${finalWidth}px`;
+                }
+            };
         }
-    }, [designAreaRef]);
+    }, [designAreaRef, imgSrc]);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -145,8 +183,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 src={imgSrc}
                 alt="Design"
                 draggable={false}
-                className="design-image select-none w-auto h-auto"
-                style={{ height: `${designAreaSize.width * 0.7}px`, width: 'auto' }}
+                className="design-image select-none"
             />
             <ResizeHandle />
             <RotateHandle />
