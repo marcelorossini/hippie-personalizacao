@@ -6,8 +6,8 @@ interface ImageGalleryProps {
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ onImageSelect }) => {
   const images = [
-    'https://placehold.co/400x400/png',
-    'https://placehold.co/400x400/png',
+    './1.png',
+    './2.png',
     'https://placehold.co/400x400/png',
     'https://placehold.co/400x400/png',
     'https://placehold.co/400x400/png',

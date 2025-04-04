@@ -255,9 +255,9 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
       <div className="flex-1 h-full relative">
         <div className="relative h-full w-fit mx-auto">
           <img
-            src="https://31270.cdn.simplo7.net/static/31270/sku/SGRD_299_001_camisasublimaAAobrancap01.jpg"
+            src="./image.png"
             alt="Modelo de Camiseta"
-            className="h-full aspect-w-1 aspect-h-1 object-cover"
+            className="w-full "
           />
           <div
             id="design-area"
