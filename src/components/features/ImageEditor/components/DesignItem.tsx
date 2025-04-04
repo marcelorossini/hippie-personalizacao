@@ -34,43 +34,52 @@ const DesignItem: React.FC<DesignItemProps> = ({
     const longPressTimerRef = useRef<number | null>(null);
     const [designAreaSize, setDesignAreaSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
     const [position, setPosition] = useState<{ top: number, left: number }>({ top: 0, left: 0 });
+    const [originalImageSize, setOriginalImageSize] = useState<{ width: number, height: number } | null>(null);
+    const [userDefinedSize, setUserDefinedSize] = useState<{ width: number, height: number } | null>(null);
+    const [userDefinedPosition, setUserDefinedPosition] = useState<{ top: number, left: number } | null>(null);
+    const [isUserModified, setIsUserModified] = useState(false);
+    const [currentScale, setCurrentScale] = useState(1);
 
+    // Função para calcular o tamanho ideal da imagem
+    const calculateIdealImageSize = (designWidth: number, designHeight: number, imgWidth: number, imgHeight: number) => {
+        const imageAspectRatio = imgWidth / imgHeight;
+        const maxHeight = designHeight * 0.7;
+        let finalHeight = maxHeight;
+        let finalWidth = finalHeight * imageAspectRatio;
+        
+        if (finalWidth > designWidth) {
+            finalWidth = designWidth;
+            finalHeight = finalWidth / imageAspectRatio;
+            
+            if (finalHeight > maxHeight) {
+                finalHeight = designHeight * 0.5;
+                finalWidth = finalHeight * imageAspectRatio;
+            }
+        }
+        
+        return { width: finalWidth, height: finalHeight };
+    };
+
+    // Efeito para carregar a imagem e calcular dimensões iniciais
     useEffect(() => {
         if (designAreaRef.current) {
             const designArea = designAreaRef.current;
             const newWidth = designArea.clientWidth;
             const newHeight = designArea.clientHeight;
             
-            // Calcula a altura máxima permitida (70% da altura da área de design)
-            const maxHeight = newHeight * 0.7;
-            
-            // Carrega a imagem para obter suas dimensões originais
             const img = new Image();
             img.src = imgSrc;
             
             img.onload = () => {
-                // Calcula a proporção da imagem
-                const imageAspectRatio = img.width / img.height;
+                // Armazena as dimensões originais da imagem
+                setOriginalImageSize({ width: img.width, height: img.height });
                 
-                // Calcula as dimensões finais mantendo a proporção
-                let finalHeight = maxHeight;
-                let finalWidth = finalHeight * imageAspectRatio;
-                
-                // Se a largura calculada exceder a largura da área, recalcula baseado na largura
-                if (finalWidth > newWidth) {
-                    finalWidth = newWidth;
-                    finalHeight = finalWidth / imageAspectRatio;
-                    
-                    // Se ainda assim a altura for maior que 70%, reduz para 50%
-                    if (finalHeight > maxHeight) {
-                        finalHeight = newHeight * 0.5;
-                        finalWidth = finalHeight * imageAspectRatio;
-                    }
-                }
+                // Calcula o tamanho ideal inicial
+                const idealSize = calculateIdealImageSize(newWidth, newHeight, img.width, img.height);
                 
                 // Calcula a posição central
-                const topPosition = (newHeight - finalHeight) / 2;
-                const leftPosition = (newWidth - finalWidth) / 2;
+                const topPosition = (newHeight - idealSize.height) / 2;
+                const leftPosition = (newWidth - idealSize.width) / 2;
                 
                 setDesignAreaSize({
                     width: newWidth,
@@ -85,13 +94,92 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 // Atualiza o tamanho da imagem
                 const imageElement = containerRef.current?.querySelector('.design-image') as HTMLImageElement;
                 if (imageElement) {
-                    imageElement.style.height = `${finalHeight}px`;
-                    imageElement.style.width = `${finalWidth}px`;
+                    imageElement.style.height = `${idealSize.height}px`;
+                    imageElement.style.width = `${idealSize.width}px`;
                 }
             };
         }
     }, [designAreaRef, imgSrc]);
 
+    // Efeito para lidar com o redimensionamento da janela
+    useEffect(() => {
+        const handleResize = () => {
+            if (designAreaRef.current && containerRef.current) {
+                const designArea = designAreaRef.current;
+                const container = containerRef.current;
+                const image = container.querySelector('.design-image') as HTMLImageElement;
+                
+                if (!image) return;
+                
+                const newWidth = designArea.clientWidth;
+                const newHeight = designArea.clientHeight;
+                
+                // Se o usuário já modificou a imagem, mantém as proporções relativas
+                if (isUserModified && userDefinedSize) {
+                    // Calcula a proporção relativa da largura e altura em relação à área de design
+                    const widthRatio = userDefinedSize.width / designAreaSize.width;
+                    const heightRatio = userDefinedSize.height / designAreaSize.height;
+                    
+                    // Aplica as mesmas proporções à nova área de design
+                    const newImageWidth = newWidth * widthRatio;
+                    const newImageHeight = newHeight * heightRatio;
+                    
+                    // Atualiza o tamanho da imagem
+                    image.style.width = `${newImageWidth}px`;
+                    image.style.height = `${newImageHeight}px`;
+                    
+                    // Atualiza o tamanho definido pelo usuário
+                    setUserDefinedSize({
+                        width: newImageWidth,
+                        height: newImageHeight
+                    });
+                } else if (originalImageSize) {
+                    // Se o usuário não modificou, calcula o tamanho ideal
+                    const idealSize = calculateIdealImageSize(
+                        newWidth, 
+                        newHeight, 
+                        originalImageSize.width, 
+                        originalImageSize.height
+                    );
+                    
+                    // Atualiza o tamanho da imagem
+                    image.style.width = `${idealSize.width}px`;
+                    image.style.height = `${idealSize.height}px`;
+                }
+                
+                // Ajusta a posição para manter a proporção relativa
+                const currentLeft = parseFloat(container.style.left) || 0;
+                const currentTop = parseFloat(container.style.top) || 0;
+                
+                const relativeLeft = currentLeft / designAreaSize.width;
+                const relativeTop = currentTop / designAreaSize.height;
+                
+                const newLeft = relativeLeft * newWidth;
+                const newTop = relativeTop * newHeight;
+                
+                container.style.left = `${newLeft}px`;
+                container.style.top = `${newTop}px`;
+                
+                // Se o usuário já modificou a posição, atualiza a posição definida pelo usuário
+                if (isUserModified && userDefinedPosition) {
+                    setUserDefinedPosition({
+                        top: newTop,
+                        left: newLeft
+                    });
+                }
+                
+                setDesignAreaSize({
+                    width: newWidth,
+                    height: newHeight
+                });
+            }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [designAreaRef, designAreaSize, originalImageSize, isUserModified, userDefinedSize, userDefinedPosition]);
+
+    // Efeito para aplicar as funcionalidades de drag, resize, rotate e pinch-zoom
     useEffect(() => {
         if (containerRef.current) {
             // Aplica as funcionalidades de drag, resize, rotate e pinch‑zoom
@@ -110,6 +198,52 @@ const DesignItem: React.FC<DesignItemProps> = ({
             }
         }
     }, [designAreaRef]);
+
+    // Efeito para detectar mudanças na posição e tamanho definidos pelo usuário
+    useEffect(() => {
+        if (containerRef.current) {
+            const container = containerRef.current;
+            const image = container.querySelector('.design-image') as HTMLImageElement;
+            
+            if (!image) return;
+            
+            // Observa mudanças no tamanho e posição
+            const resizeObserver = new ResizeObserver(() => {
+                const currentWidth = image.offsetWidth;
+                const currentHeight = image.offsetHeight;
+                const currentLeft = parseFloat(container.style.left) || 0;
+                const currentTop = parseFloat(container.style.top) || 0;
+                
+                // Verifica se houve mudança em relação ao tamanho inicial
+                if (originalImageSize && 
+                    (currentWidth !== originalImageSize.width || 
+                     currentHeight !== originalImageSize.height)) {
+                    setIsUserModified(true);
+                    setUserDefinedSize({
+                        width: currentWidth,
+                        height: currentHeight
+                    });
+                }
+                
+                // Verifica se houve mudança na posição
+                if (position && 
+                    (currentLeft !== position.left || 
+                     currentTop !== position.top)) {
+                    setIsUserModified(true);
+                    setUserDefinedPosition({
+                        top: currentTop,
+                        left: currentLeft
+                    });
+                }
+            });
+            
+            resizeObserver.observe(container);
+            
+            return () => {
+                resizeObserver.disconnect();
+            };
+        }
+    }, [containerRef, originalImageSize, position]);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;

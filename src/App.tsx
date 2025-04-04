@@ -17,6 +17,7 @@ function App() {
     setIsDrawerOpen(false);
   };
 
+  /*
   function add() {
     const searchParams = new URLSearchParams(window.location.href);
     var product_variant_id = searchParams.get('product_variant_id');
@@ -25,11 +26,12 @@ function App() {
       addToCartClick(${product_variant_id})
     `, '*')
   }
+<button onClick={() => add()}>TESTE</button>
+  */
 
 
   return (
-    <div className="relative">
-      <button onClick={() => add()}>TESTE</button>
+    <div className="relative w-full h-full border-2 border-red-500">      
       <div className="fixed top-4 right-4 z-10">
         <button
           onClick={() => setIsDrawerOpen(true)}

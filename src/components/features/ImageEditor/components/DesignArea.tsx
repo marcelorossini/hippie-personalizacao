@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import DesignItem from './DesignItem';
 import heic2any from 'heic2any';
 
@@ -20,6 +20,8 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
   const designAreaRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const layerCounterRef = useRef<number>(1);
+  const templateImageRef = useRef<HTMLImageElement>(null);
+  const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
 
 
   // Função para converter arquivos HEIC para JPEG e retornar uma Data URL
@@ -230,8 +232,66 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
     };
   }, []);
 
+  useEffect(() => {
+    const updateDesignAreaSize = () => {
+      if (templateImageRef.current && designAreaRef.current) {
+        const templateImg = templateImageRef.current;
+        const designArea = designAreaRef.current;
+        
+        // Obtém as dimensões do container pai
+        const containerWidth = designArea.parentElement?.clientWidth || 0;
+        const containerHeight = designArea.parentElement?.clientHeight || 0;
+        
+        // Calcula a proporção da imagem template
+        const templateAspectRatio = templateImg.naturalWidth / templateImg.naturalHeight;
+        
+        // Calcula as dimensões máximas permitidas (80% do container)
+        const maxWidth = containerWidth * 0.8;
+        const maxHeight = containerHeight * 0.8;
+        
+        // Calcula as dimensões mantendo a proporção
+        let newWidth = maxWidth;
+        let newHeight = newWidth / templateAspectRatio;
+        
+        // Se a altura exceder o máximo, recalcula baseado na altura
+        if (newHeight > maxHeight) {
+          newHeight = maxHeight;
+          newWidth = newHeight * templateAspectRatio;
+        }
+        
+        // Atualiza o tamanho da área de design
+        designArea.style.width = `${newWidth}px`;
+        designArea.style.height = `${newHeight}px`;
+        
+        // Atualiza o estado com as novas dimensões
+        setTemplateSize({
+          width: newWidth,
+          height: newHeight
+        });
+      }
+    };
+
+    // Observa mudanças no tamanho da imagem template
+    const resizeObserver = new ResizeObserver(updateDesignAreaSize);
+    if (templateImageRef.current) {
+      resizeObserver.observe(templateImageRef.current);
+    }
+
+    // Adiciona um listener para redimensionamento da janela
+    window.addEventListener('resize', updateDesignAreaSize);
+
+    // Atualiza o tamanho inicial
+    updateDesignAreaSize();
+
+    // Limpa os listeners quando o componente for desmontado
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateDesignAreaSize);
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 relative">
+    <div className="flex flex-col flex-1 relative border-2 border-red-500 h-full overflow-hidden">
       <div>
         <div className="mb-3 flex gap-3">
           <input
@@ -252,17 +312,26 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
           </button>
         </div>
       </div>
-      <div className="flex-1 h-full relative">
-        <div className="relative h-full w-fit mx-auto">
+      <div className="flex-1 relative border-2 border-blue-500 overflow-hidden">
+        <div className="relative h-full w-full flex items-center justify-center border-2 border-green-500 overflow-hidden">
           <img
+            draggable={false}
+            ref={templateImageRef}
             src="./image.png"
             alt="Modelo de Camiseta"
-            className="w-full "
+            className="max-h-full max-w-full object-contain border-2 border-yellow-500"
           />
           <div
             id="design-area"
             ref={designAreaRef}
-            className="design-area absolute top-0 left-0 w-full h-full border overflow-hidden select-none"
+            className="design-area absolute overflow-hidden select-none border-2 border-purple-500"
+            style={{
+              width: `${templateSize.width}px`,
+              height: `${templateSize.height}px`,
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedLayerId(null);
