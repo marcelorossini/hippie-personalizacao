@@ -85,8 +85,6 @@ export const makeResizable = (container: HTMLElement, image: HTMLImageElement, h
     startWidth = image.offsetWidth;
     const startHeight = image.offsetHeight;
     aspectRatio = startWidth / startHeight;
-    //container.style.width = startWidth + 'px';
-    //container.style.height = startHeight + 'px';
 
     if (e.type === 'touchstart') {
       document.addEventListener('touchmove', resizeMove, { passive: false });
@@ -104,19 +102,34 @@ export const makeResizable = (container: HTMLElement, image: HTMLImageElement, h
     const dx = pointer.clientX - startX;
     let newWidth = startWidth + dx;
     newWidth = Math.max(newWidth, 20);
+    
     const currentLeft = parseFloat(container.style.left) || container.offsetLeft;
     const currentTop = parseFloat(container.style.top) || container.offsetTop;
-    let maxWidth = newWidth, maxHeight = newWidth;
+    
+    // Calcula as dimensões máximas permitidas
+    let maxWidth = newWidth;
+    let maxHeight = newWidth;
+    
     if (designAreaRef.current) {
       maxWidth = designAreaRef.current.offsetWidth - currentLeft;
       maxHeight = designAreaRef.current.offsetHeight - currentTop;
     }
-    newWidth = Math.min(newWidth, maxWidth, maxHeight * aspectRatio);
-    const newHeight = newWidth / aspectRatio;
-    image.style.width = newWidth + 'px';
-    image.style.height = newHeight + 'px';
-    //container.style.width = newWidth + 'px';
-    //container.style.height = newHeight + 'px';
+    
+    // Garante que a largura não exceda o máximo permitido
+    newWidth = Math.min(newWidth, maxWidth);
+    
+    // Calcula a altura mantendo o aspect ratio
+    let newHeight = newWidth / aspectRatio;
+    
+    // Se a altura exceder o máximo permitido, recalcula baseado na altura
+    if (newHeight > maxHeight) {
+      newHeight = maxHeight;
+      newWidth = newHeight * aspectRatio;
+    }
+    
+    // Aplica as novas dimensões mantendo o aspect ratio
+    image.style.width = `${newWidth}px`;
+    image.style.height = `${newHeight}px`;
   };
 
   const resizeEnd = (e: MouseEvent | TouchEvent) => {
@@ -228,22 +241,45 @@ export const makePinchZoomable = (container: HTMLElement, image: HTMLImageElemen
       touch2.clientY - touch1.clientY
     );
     const scale = currentDistance / initialDistance;
+    
+    // Calcula as novas dimensões mantendo o aspect ratio
     let newWidth = initialWidth * scale;
     let newHeight = initialHeight * scale;
+    
+    // Define o tamanho mínimo
     newWidth = Math.max(newWidth, 20);
     newHeight = Math.max(newHeight, 20);
+    
+    // Obtém a posição atual
     const currentLeft = parseFloat(container.style.left) || container.offsetLeft;
     const currentTop = parseFloat(container.style.top) || container.offsetTop;
-    let maxWidth = newWidth, maxHeight = newHeight;
+    
+    // Calcula as dimensões máximas permitidas
+    let maxWidth = newWidth;
+    let maxHeight = newHeight;
+    
     if (designAreaRef.current) {
       maxWidth = designAreaRef.current.offsetWidth - currentLeft;
       maxHeight = designAreaRef.current.offsetHeight - currentTop;
     }
-    newWidth = Math.min(newWidth, maxWidth, maxHeight * aspectRatio);
+    
+    // Garante que a largura não exceda o máximo permitido
+    newWidth = Math.min(newWidth, maxWidth);
+    
+    // Calcula a altura mantendo o aspect ratio
     newHeight = newWidth / aspectRatio;
-    image.style.width = newWidth + 'px';
-    image.style.height = newHeight + 'px';
+    
+    // Se a altura exceder o máximo permitido, recalcula baseado na altura
+    if (newHeight > maxHeight) {
+      newHeight = maxHeight;
+      newWidth = newHeight * aspectRatio;
+    }
+    
+    // Aplica as novas dimensões
+    image.style.width = `${newWidth}px`;
+    image.style.height = `${newHeight}px`;
 
+    // Calcula a rotação
     const currentPinchAngle = Math.atan2(
       touch2.clientY - touch1.clientY,
       touch2.clientX - touch1.clientX

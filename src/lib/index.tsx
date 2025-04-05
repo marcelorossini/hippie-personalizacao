@@ -48,12 +48,14 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ layerManager }) => {
           removeLayer={removeLayer}
         />
       </div>
-      <DesignArea
-        layers={layers}
-        setLayers={setLayers}
-        selectedLayerId={selectedLayerId}
-        setSelectedLayerId={setSelectedLayerId}
-      />
+      <div className="flex-1 flex items-center justify-center">
+        <DesignArea
+          layers={layers}
+          setLayers={setLayers}
+          selectedLayerId={selectedLayerId}
+          setSelectedLayerId={setSelectedLayerId}
+        />
+      </div>
     </div>
   );
 };

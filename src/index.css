@@ -1,6 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
 
-:root {}
+:root {
+  font-family: 'Open Sans', sans-serif;
+}
 
 /* reset.css */
 html,
@@ -11,6 +14,7 @@ body {
   margin: 0;
   touch-action: none;
   overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
 }
 
 #root {

@@ -43,14 +43,27 @@ const DesignItem: React.FC<DesignItemProps> = ({
     // Função para calcular o tamanho ideal da imagem
     const calculateIdealImageSize = (designWidth: number, designHeight: number, imgWidth: number, imgHeight: number) => {
         const imageAspectRatio = imgWidth / imgHeight;
-        const maxHeight = designHeight * 0.7;
-        let finalHeight = maxHeight;
-        let finalWidth = finalHeight * imageAspectRatio;
         
-        if (finalWidth > designWidth) {
-            finalWidth = designWidth;
+        // Define o tamanho máximo como 70% da área de design
+        const maxWidth = designWidth * 0.7;
+        const maxHeight = designHeight * 0.7;
+        
+        // Calcula as dimensões mantendo o aspect ratio
+        let finalWidth = maxWidth;
+        let finalHeight = finalWidth / imageAspectRatio;
+        
+        // Se a altura exceder o máximo, recalcula baseado na altura
+        if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = finalHeight * imageAspectRatio;
+        }
+        
+        // Se ainda assim a largura exceder o máximo, reduz para 50% da área de design
+        if (finalWidth > maxWidth) {
+            finalWidth = designWidth * 0.5;
             finalHeight = finalWidth / imageAspectRatio;
             
+            // Se a altura ainda exceder o máximo, recalcula baseado na altura
             if (finalHeight > maxHeight) {
                 finalHeight = designHeight * 0.5;
                 finalWidth = finalHeight * imageAspectRatio;
@@ -120,9 +133,24 @@ const DesignItem: React.FC<DesignItemProps> = ({
                     const widthRatio = userDefinedSize.width / designAreaSize.width;
                     const heightRatio = userDefinedSize.height / designAreaSize.height;
                     
+                    // Calcula o aspect ratio original da imagem
+                    const imageAspectRatio = userDefinedSize.width / userDefinedSize.height;
+                    
                     // Aplica as mesmas proporções à nova área de design
-                    const newImageWidth = newWidth * widthRatio;
-                    const newImageHeight = newHeight * heightRatio;
+                    let newImageWidth = newWidth * widthRatio;
+                    let newImageHeight = newHeight * heightRatio;
+                    
+                    // Garante que o aspect ratio seja mantido
+                    if (Math.abs(newImageWidth / newImageHeight - imageAspectRatio) > 0.01) {
+                        // Se o aspect ratio foi perdido, recalcula baseado na largura
+                        newImageHeight = newImageWidth / imageAspectRatio;
+                        
+                        // Se a altura exceder o limite, recalcula baseado na altura
+                        if (newImageHeight > newHeight * 0.8) {
+                            newImageHeight = newHeight * 0.8;
+                            newImageWidth = newImageHeight * imageAspectRatio;
+                        }
+                    }
                     
                     // Atualiza o tamanho da imagem
                     image.style.width = `${newImageWidth}px`;
