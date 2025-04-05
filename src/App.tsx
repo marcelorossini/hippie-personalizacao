@@ -17,21 +17,22 @@ function App() {
     setIsDrawerOpen(false);
   };
 
-  /*
+  
   function add() {
     const searchParams = new URLSearchParams(window.location.href);
     var product_variant_id = searchParams.get('product_variant_id');
 
     window.top.postMessage(`
-      addToCartClick(${product_variant_id})
+      addToCartClick(${product_variant_id}).then(i => console.log(i))
     `, '*')
   }
-<button onClick={() => add()}>TESTE</button>
-  */
+
 
 
   return (
     <div className="relative w-full h-full border-2 border-red-500">      
+    <button onClick={() => add()}>TESTE</button>
+
       <div className="fixed top-4 right-4 z-10">
         <button
           onClick={() => setIsDrawerOpen(true)}
