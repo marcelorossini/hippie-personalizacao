@@ -40,16 +40,24 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     sendLayerToFront,
     sendLayerToBack,
     removeLayer,
+    addLayer,
   } = layerManager;
 
   const handleImageSelect = (imageUrl: string) => {
     const layerId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    setLayers((prev: Layer[]) => [...prev, {
+    addLayer({
       id: layerId,
       name: 'Camada ' + layerId,
+      type: 'image',
       imgSrc: imageUrl,
-    }]);
+    });
     onImageSelect?.(imageUrl);
+  };
+
+  const updateLayer = (updatedLayer: Layer) => {
+    setLayers(prev => prev.map(layer => 
+      layer.id === updatedLayer.id ? updatedLayer : layer
+    ));
   };
 
   return (
@@ -64,6 +72,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
           sendLayerToFront={sendLayerToFront}
           sendLayerToBack={sendLayerToBack}
           removeLayer={removeLayer}
+          addLayer={addLayer}
+          updateLayer={updateLayer}
         />
       </div>
       <div className="flex-1 flex items-center justify-center">

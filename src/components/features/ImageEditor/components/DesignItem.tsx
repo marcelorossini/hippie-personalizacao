@@ -6,10 +6,12 @@ import {
     makeRotatable,
     makePinchZoomable
 } from '../utils/dragUtils';
+import { Layer } from '../types/layer';
+import './DesignItem.css';
 
 interface DesignItemProps {
     id: string;
-    imgSrc: string;
+    layer: Layer;
     designAreaRef: React.RefObject<HTMLDivElement | null>;
     isSelected: boolean;
     selectLayer: (layerId: string) => void;
@@ -21,7 +23,7 @@ interface DesignItemProps {
 
 const DesignItem: React.FC<DesignItemProps> = ({
     id,
-    imgSrc,
+    layer,
     designAreaRef,
     isSelected,
     selectLayer,
@@ -34,15 +36,15 @@ const DesignItem: React.FC<DesignItemProps> = ({
     const longPressTimerRef = useRef<number | null>(null);
     const [designAreaSize, setDesignAreaSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
     const [position, setPosition] = useState<{ top: number, left: number }>({ top: 0, left: 0 });
-    const [originalImageSize, setOriginalImageSize] = useState<{ width: number, height: number } | null>(null);
+    const [originalSize, setOriginalSize] = useState<{ width: number, height: number } | null>(null);
     const [userDefinedSize, setUserDefinedSize] = useState<{ width: number, height: number } | null>(null);
     const [userDefinedPosition, setUserDefinedPosition] = useState<{ top: number, left: number } | null>(null);
     const [isUserModified, setIsUserModified] = useState(false);
     const [currentScale, setCurrentScale] = useState(1);
 
-    // Função para calcular o tamanho ideal da imagem
-    const calculateIdealImageSize = (designWidth: number, designHeight: number, imgWidth: number, imgHeight: number) => {
-        const imageAspectRatio = imgWidth / imgHeight;
+    // Função para calcular o tamanho ideal do elemento
+    const calculateIdealSize = (designWidth: number, designHeight: number, elementWidth: number, elementHeight: number) => {
+        const aspectRatio = elementWidth / elementHeight;
         
         // Define o tamanho máximo como 70% da área de design
         const maxWidth = designWidth * 0.7;
@@ -50,49 +52,48 @@ const DesignItem: React.FC<DesignItemProps> = ({
         
         // Calcula as dimensões mantendo o aspect ratio
         let finalWidth = maxWidth;
-        let finalHeight = finalWidth / imageAspectRatio;
+        let finalHeight = finalWidth / aspectRatio;
         
         // Se a altura exceder o máximo, recalcula baseado na altura
         if (finalHeight > maxHeight) {
             finalHeight = maxHeight;
-            finalWidth = finalHeight * imageAspectRatio;
+            finalWidth = finalHeight * aspectRatio;
         }
         
         // Se ainda assim a largura exceder o máximo, reduz para 50% da área de design
         if (finalWidth > maxWidth) {
             finalWidth = designWidth * 0.5;
-            finalHeight = finalWidth / imageAspectRatio;
+            finalHeight = finalWidth / aspectRatio;
             
             // Se a altura ainda exceder o máximo, recalcula baseado na altura
             if (finalHeight > maxHeight) {
                 finalHeight = designHeight * 0.5;
-                finalWidth = finalHeight * imageAspectRatio;
+                finalWidth = finalHeight * aspectRatio;
             }
         }
         
         return { width: finalWidth, height: finalHeight };
     };
 
-    // Efeito para carregar a imagem e calcular dimensões iniciais
+    // Efeito para carregar o elemento e calcular dimensões iniciais
     useEffect(() => {
         if (designAreaRef.current) {
             const designArea = designAreaRef.current;
             const newWidth = designArea.clientWidth;
             const newHeight = designArea.clientHeight;
             
-            const img = new Image();
-            img.src = imgSrc;
-            
-            img.onload = () => {
-                // Armazena as dimensões originais da imagem
-                setOriginalImageSize({ width: img.width, height: img.height });
+            if (layer.type === 'text') {
+                // Para texto, usamos um tamanho inicial padrão
+                const initialSize = {
+                    width: 200,
+                    height: 50
+                };
                 
-                // Calcula o tamanho ideal inicial
-                const idealSize = calculateIdealImageSize(newWidth, newHeight, img.width, img.height);
+                setOriginalSize(initialSize);
                 
                 // Calcula a posição central
-                const topPosition = (newHeight - idealSize.height) / 2;
-                const leftPosition = (newWidth - idealSize.width) / 2;
+                const topPosition = (newHeight - initialSize.height) / 2;
+                const leftPosition = (newWidth - initialSize.width) / 2;
                 
                 setDesignAreaSize({
                     width: newWidth,
@@ -104,15 +105,44 @@ const DesignItem: React.FC<DesignItemProps> = ({
                     left: leftPosition
                 });
                 
-                // Atualiza o tamanho da imagem
-                const imageElement = containerRef.current?.querySelector('.design-image') as HTMLImageElement;
-                if (imageElement) {
-                    imageElement.style.height = `${idealSize.height}px`;
-                    imageElement.style.width = `${idealSize.width}px`;
+                // Atualiza o tamanho do elemento
+                const textElement = containerRef.current?.querySelector('.design-text') as HTMLDivElement;
+                if (textElement) {
+                    textElement.style.height = `${initialSize.height}px`;
+                    textElement.style.width = `${initialSize.width}px`;
                 }
-            };
+            } else if (layer.imgSrc) {
+                // Para imagens, carregamos a imagem e calculamos o tamanho
+                const img = new Image();
+                img.src = layer.imgSrc;
+                
+                img.onload = () => {
+                    setOriginalSize({ width: img.width, height: img.height });
+                    
+                    const idealSize = calculateIdealSize(newWidth, newHeight, img.width, img.height);
+                    
+                    const topPosition = (newHeight - idealSize.height) / 2;
+                    const leftPosition = (newWidth - idealSize.width) / 2;
+                    
+                    setDesignAreaSize({
+                        width: newWidth,
+                        height: newHeight
+                    });
+                    
+                    setPosition({
+                        top: topPosition,
+                        left: leftPosition
+                    });
+                    
+                    const imageElement = containerRef.current?.querySelector('.design-image') as HTMLImageElement;
+                    if (imageElement) {
+                        imageElement.style.height = `${idealSize.height}px`;
+                        imageElement.style.width = `${idealSize.width}px`;
+                    }
+                };
+            }
         }
-    }, [designAreaRef, imgSrc]);
+    }, [designAreaRef, layer]);
 
     // Efeito para lidar com o redimensionamento da janela
     useEffect(() => {
@@ -161,13 +191,13 @@ const DesignItem: React.FC<DesignItemProps> = ({
                         width: newImageWidth,
                         height: newImageHeight
                     });
-                } else if (originalImageSize) {
+                } else if (originalSize) {
                     // Se o usuário não modificou, calcula o tamanho ideal
-                    const idealSize = calculateIdealImageSize(
+                    const idealSize = calculateIdealSize(
                         newWidth, 
                         newHeight, 
-                        originalImageSize.width, 
-                        originalImageSize.height
+                        originalSize.width, 
+                        originalSize.height
                     );
                     
                     // Atualiza o tamanho da imagem
@@ -205,7 +235,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
         
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [designAreaRef, designAreaSize, originalImageSize, isUserModified, userDefinedSize, userDefinedPosition]);
+    }, [designAreaRef, designAreaSize, originalSize, isUserModified, userDefinedSize, userDefinedPosition]);
 
     // Efeito para aplicar as funcionalidades de drag, resize, rotate e pinch-zoom
     useEffect(() => {
@@ -243,9 +273,9 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 const currentTop = parseFloat(container.style.top) || 0;
                 
                 // Verifica se houve mudança em relação ao tamanho inicial
-                if (originalImageSize && 
-                    (currentWidth !== originalImageSize.width || 
-                     currentHeight !== originalImageSize.height)) {
+                if (originalSize && 
+                    (currentWidth !== originalSize.width || 
+                     currentHeight !== originalSize.height)) {
                     setIsUserModified(true);
                     setUserDefinedSize({
                         width: currentWidth,
@@ -271,7 +301,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 resizeObserver.disconnect();
             };
         }
-    }, [containerRef, originalImageSize, position]);
+    }, [containerRef, originalSize, position]);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
@@ -325,30 +355,52 @@ const DesignItem: React.FC<DesignItemProps> = ({
     return (
         <div
             ref={containerRef}
+            className={`design-item absolute ${isSelected ? 'selected' : ''}`}
             style={{
-                position: 'absolute',
                 top: `${position.top}px`,
-                left: `${position.left}px`
+                left: `${position.left}px`,
+                transform: `scale(${currentScale})`,
             }}
-            className={`design-item cursor-move transform origin-center border-3 border-dashed inline-flex ${
-                isSelected ? 'border-blue-500 z-50' : 'border-transparent'
-            }`}
-            data-rotate-angle="0"
-            data-layer-id={id}
             onMouseDown={handleMouseDown}
             onContextMenu={handleContextMenu}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
         >
-            <img
-                src={imgSrc}
-                alt="Design"
-                draggable={false}
-                className="design-image select-none"
-            />
-            <ResizeHandle />
-            <RotateHandle />
+            {layer.type === 'text' ? (
+                <div
+                    className="design-text"
+                    style={{
+                        fontSize: `${layer.fontSize || 24}px`,
+                        fontFamily: layer.fontFamily || 'Arial',
+                        color: layer.color || '#000000',
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        userSelect: 'none',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        textAlign: 'center',
+                    }}
+                >
+                    {layer.text || 'Digite seu texto aqui'}
+                </div>
+            ) : (
+                <img
+                    src={layer.imgSrc}
+                    alt="Design"
+                    className="design-image"
+                    draggable={false}
+                />
+            )}
+            {isSelected && (
+                <>
+                    <ResizeHandle className="resize-handle" />
+                    <RotateHandle className="rotate-handle" />
+                </>
+            )}
         </div>
     );
 };

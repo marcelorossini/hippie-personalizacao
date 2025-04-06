@@ -58,6 +58,12 @@ export const useLayerManager = () => {
     setLayers(prev => [...prev, layer]);
   };
 
+  const updateLayer = (updatedLayer: Layer) => {
+    setLayers(prev => prev.map(layer => 
+      layer.id === updatedLayer.id ? updatedLayer : layer
+    ));
+  };
+
   return {
     layers,
     setLayers,
@@ -69,5 +75,6 @@ export const useLayerManager = () => {
     sendLayerToBack,
     removeLayer,
     addLayer,
+    updateLayer,
   };
 }; 

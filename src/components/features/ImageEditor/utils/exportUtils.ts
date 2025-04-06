@@ -32,33 +32,64 @@ export const exportLayers = (designAreaRef: React.RefObject<HTMLDivElement | nul
     const left = parseFloat((item as HTMLElement).style.left) || 0;
     const top = parseFloat((item as HTMLElement).style.top) || 0;
     const angle = parseFloat((item as HTMLElement).dataset.rotateAngle || '0') || 0;
-    const img = (item as HTMLElement).querySelector('.design-image') as HTMLImageElement;
-    if (!img) return;
-
-    const imgWidth = img.offsetWidth;
-    const imgHeight = img.offsetHeight;
     
-    // Verifica se o aspect ratio está correto
-    const naturalWidth = img.naturalWidth;
-    const naturalHeight = img.naturalHeight;
-    const aspectRatio = naturalWidth / naturalHeight;
+    // Verifica se é uma camada de texto ou imagem
+    const textElement = (item as HTMLElement).querySelector('.design-text') as HTMLDivElement;
+    const imgElement = (item as HTMLElement).querySelector('.design-image') as HTMLImageElement;
     
-    // Se o aspect ratio estiver incorreto, corrige
-    let finalWidth = imgWidth;
-    let finalHeight = imgHeight;
-    
-    if (Math.abs(imgWidth / imgHeight - aspectRatio) > 0.01) {
-      finalHeight = imgWidth / aspectRatio;
+    if (textElement) {
+      // É uma camada de texto
+      const text = textElement.textContent || '';
+      const fontSize = parseFloat(window.getComputedStyle(textElement).fontSize) || 24;
+      const fontFamily = window.getComputedStyle(textElement).fontFamily;
+      const color = window.getComputedStyle(textElement).color;
+      
+      const textWidth = textElement.offsetWidth;
+      const textHeight = textElement.offsetHeight;
+      
+      const centerX = left + textWidth / 2;
+      const centerY = top + textHeight / 2;
+      
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(angle * Math.PI / 180);
+      
+      // Configura o estilo do texto
+      ctx.font = `${fontSize}px ${fontFamily}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Desenha o texto
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
+    } else if (imgElement) {
+      // É uma camada de imagem
+      const imgWidth = imgElement.offsetWidth;
+      const imgHeight = imgElement.offsetHeight;
+      
+      // Verifica se o aspect ratio está correto
+      const naturalWidth = imgElement.naturalWidth;
+      const naturalHeight = imgElement.naturalHeight;
+      const aspectRatio = naturalWidth / naturalHeight;
+      
+      // Se o aspect ratio estiver incorreto, corrige
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+      
+      if (Math.abs(imgWidth / imgHeight - aspectRatio) > 0.01) {
+        finalHeight = imgWidth / aspectRatio;
+      }
+      
+      const centerX = left + finalWidth / 2;
+      const centerY = top + finalHeight / 2;
+      
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(angle * Math.PI / 180);
+      ctx.drawImage(imgElement, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
+      ctx.restore();
     }
-    
-    const centerX = left + finalWidth / 2;
-    const centerY = top + finalHeight / 2;
-
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(angle * Math.PI / 180);
-    ctx.drawImage(img, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
-    ctx.restore();
   });
 
   ctx.restore();

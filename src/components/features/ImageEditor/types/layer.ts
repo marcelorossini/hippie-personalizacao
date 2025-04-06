@@ -1,7 +1,12 @@
 export interface Layer {
   id: string;
   name: string;
-  imgSrc: string;
+  imgSrc?: string;
+  text?: string;
+  type: 'image' | 'text';
+  fontSize?: number;
+  fontFamily?: string;
+  color?: string;
 }
 
 export interface LayerTransform {

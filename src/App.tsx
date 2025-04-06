@@ -3,6 +3,7 @@ import ImageEditor from './lib';
 import { useLayerManager } from './components/features/ImageEditor/hooks/useLayerManager';
 import { handleFileUpload } from './components/features/ImageEditor/utils/imageUtils';
 import Header from './components/features/Header';
+import { Layer } from './components/features/ImageEditor/types/layer';
 
 function App() {
   const layerManager = useLayerManager();
@@ -15,11 +16,13 @@ function App() {
       const dataUrl = await handleFileUpload(event);
       if (dataUrl) {
         const layerId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        layerManager.addLayer({
+        const newLayer: Layer = {
           id: layerId,
           name: 'Camada ' + layerId,
+          type: 'image',
           imgSrc: dataUrl,
-        });
+        };
+        layerManager.addLayer(newLayer);
       }
     } finally {
       setIsLoading(false);

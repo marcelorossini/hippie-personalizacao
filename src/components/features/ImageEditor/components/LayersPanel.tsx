@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layer } from '../types';
+import TextLayer from './TextLayer';
 
 interface LayersPanelProps {
   layers: Layer[];
@@ -10,6 +11,8 @@ interface LayersPanelProps {
   sendLayerToFront: () => void;
   sendLayerToBack: () => void;
   removeLayer: () => void;
+  addLayer: (layer: Layer) => void;
+  updateLayer: (layer: Layer) => void;
 }
 
 const LayersPanel: React.FC<LayersPanelProps> = ({
@@ -20,8 +23,12 @@ const LayersPanel: React.FC<LayersPanelProps> = ({
   moveLayerBackward,
   sendLayerToFront,
   sendLayerToBack,
-  removeLayer
+  removeLayer,
+  addLayer,
+  updateLayer
 }) => {
+  const [showTextOptions, setShowTextOptions] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedLayerId) return;
@@ -57,9 +64,43 @@ const LayersPanel: React.FC<LayersPanelProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedLayerId, moveLayerForward, moveLayerBackward, sendLayerToFront, sendLayerToBack, removeLayer]);
 
+  const handleAddText = () => {
+    const layerId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    addLayer({
+      id: layerId,
+      name: 'Texto ' + layerId,
+      type: 'text',
+      text: 'Digite seu texto aqui',
+      fontSize: 24,
+      fontFamily: 'Roboto',
+      color: '#000000'
+    });
+    setShowTextOptions(true);
+  };
+
+  const selectedLayer = layers.find(layer => layer.id === selectedLayerId);
+
   return (
-    <div className="w-48 border border-gray-300 p-3 rounded-md shadow-sm">
-      <h3 className="text-lg font-semibold mb-3">Camadas</h3>
+    <div className="w-64 border border-gray-300 p-3 rounded-md shadow-sm">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-lg font-semibold">Camadas</h3>
+        <button
+          onClick={handleAddText}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+        >
+          + Texto
+        </button>
+      </div>
+      
+      {selectedLayer?.type === 'text' && (
+        <div className="mb-4">
+          <TextLayer
+            layer={selectedLayer}
+            onUpdate={updateLayer}
+          />
+        </div>
+      )}
+
       <div className="space-y-2">
         {layers.map((layer) => (
           <div
