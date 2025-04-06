@@ -7,10 +7,10 @@ interface ExportButtonProps {
 
 const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef }) => {
   return (
-    <div className="mt-4 p-4">
+    <div className="mt-4 p-4 flex justify-end">
       <button
         onClick={() => exportLayers(designAreaRef)}
-        className="border-none bg-[#74a451] rounded-[5px] h-16 flex items-center justify-center w-full px-5 font-bold uppercase cursor-pointer text-white text-[15px]"
+        className="border-none bg-[#74a451] rounded-[5px] h-16 flex items-center justify-center w-56 px-5 font-bold uppercase cursor-pointer text-white text-[15px]"
       >
         COLOCAR NA MOCHILA
       </button>

@@ -76,7 +76,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       </div>
       {/* Galeria lateral visível apenas em desktop */}
       <div className="hidden md:block w-64 border-l border-gray-200 p-4 overflow-y-auto">
-        <h3 className="text-lg font-semibold mb-4">Galeria de Imagens</h3>
+        <h3 className="text-lg font-semibold mb-4 text-[#5e160f]">Figurinhas da Hippie</h3>
         <ImageGallery onImageSelect={handleImageSelect} />
       </div>
       {/* Drawer para galeria em mobile */}
