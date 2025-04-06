@@ -8,6 +8,7 @@ import {
 } from '../utils/dragUtils';
 import { Layer } from '../types/layer';
 import './DesignItem.css';
+import { FaEdit } from 'react-icons/fa';
 
 interface DesignItemProps {
     id: string;
@@ -19,6 +20,7 @@ interface DesignItemProps {
     sendLayerToBack: () => void;
     sendLayerToFront: () => void;
     removeLayer: () => void;
+    onEditText?: () => void;
 }
 
 const DesignItem: React.FC<DesignItemProps> = ({
@@ -31,6 +33,7 @@ const DesignItem: React.FC<DesignItemProps> = ({
     sendLayerToBack,
     sendLayerToFront,
     removeLayer,
+    onEditText
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const longPressTimerRef = useRef<number | null>(null);
@@ -240,17 +243,9 @@ const DesignItem: React.FC<DesignItemProps> = ({
     // Efeito para aplicar as funcionalidades de drag, resize, rotate e pinch-zoom
     useEffect(() => {
         if (containerRef.current) {
-            // Aplica as funcionalidades de drag, resize, rotate e pinch‑zoom
+            // Aplica as funcionalidades de drag e pinch-zoom
             makeDraggable(containerRef.current, designAreaRef);
             const imgEl = containerRef.current.querySelector('img');
-            const resizeHandleEl = containerRef.current.querySelector('.resize-handle');
-            if (imgEl instanceof HTMLImageElement && resizeHandleEl instanceof HTMLElement) {
-                makeResizable(containerRef.current, imgEl, resizeHandleEl, designAreaRef);
-            }
-            const rotateHandleEl = containerRef.current.querySelector('.rotate-handle');
-            if (rotateHandleEl instanceof HTMLElement) {
-                makeRotatable(containerRef.current, rotateHandleEl);
-            }
             if (imgEl instanceof HTMLImageElement) {
                 makePinchZoomable(containerRef.current, imgEl, designAreaRef);
             }
@@ -307,13 +302,15 @@ const DesignItem: React.FC<DesignItemProps> = ({
         const target = e.target as HTMLElement;
         e.preventDefault();
         e.stopPropagation();
-        console.log(e)
+        
+        // Não seleciona a camada se o clique foi em um dos controles
         if (
             target.classList.contains('resize-handle') ||
             target.classList.contains('rotate-handle')
         ) {
             return;
         }
+        
         selectLayer(id);
     };
 
@@ -397,8 +394,38 @@ const DesignItem: React.FC<DesignItemProps> = ({
             )}
             {isSelected && (
                 <>
-                    <ResizeHandle className="resize-handle" />
-                    <RotateHandle className="rotate-handle" />
+                    <ResizeHandle 
+                        className="resize-handle" 
+                        onMouseDown={(e) => {
+                            e.stopPropagation();
+                            const handle = e.currentTarget;
+                            const imgEl = containerRef.current?.querySelector('img');
+                            if (imgEl instanceof HTMLImageElement && handle instanceof HTMLElement) {
+                                makeResizable(containerRef.current!, imgEl, handle, designAreaRef);
+                            }
+                        }}
+                    />
+                    <RotateHandle 
+                        className="rotate-handle" 
+                        onMouseDown={(e) => {
+                            e.stopPropagation();
+                            const handle = e.currentTarget;
+                            if (handle instanceof HTMLElement) {
+                                makeRotatable(containerRef.current!, handle);
+                            }
+                        }}
+                    />
+                    {layer.type === 'text' && onEditText && (
+                        <div 
+                            className="edit-handle"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onEditText();
+                            }}
+                        >
+                            <FaEdit size={24} />
+                        </div>
+                    )}
                 </>
             )}
         </div>

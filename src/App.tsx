@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ImageEditor from './lib';
 import { useLayerManager } from './components/features/ImageEditor/hooks/useLayerManager';
 import { handleFileUpload } from './components/features/ImageEditor/utils/imageUtils';
+import { loadGoogleFonts } from './components/features/ImageEditor/utils/fontUtils';
 import Header from './components/features/Header';
 import { Layer } from './components/features/ImageEditor/types/layer';
 
@@ -9,6 +10,10 @@ function App() {
   const layerManager = useLayerManager();
   const [showMobileGallery, setShowMobileGallery] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    loadGoogleFonts();
+  }, []);
 
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsLoading(true);

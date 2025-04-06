@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Layer } from '../types';
+import { Layer } from '../types/layer';
 import TextLayer from './TextLayer';
+import TextEditorDrawer from './TextEditorDrawer';
 
 interface LayersPanelProps {
   layers: Layer[];
@@ -28,6 +29,22 @@ const LayersPanel: React.FC<LayersPanelProps> = ({
   updateLayer
 }) => {
   const [showTextOptions, setShowTextOptions] = useState(false);
+  const [showTextDrawer, setShowTextDrawer] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Verifica se está em um dispositivo móvel
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -80,75 +97,87 @@ const LayersPanel: React.FC<LayersPanelProps> = ({
 
   const selectedLayer = layers.find(layer => layer.id === selectedLayerId);
 
-  return (
-    <div className="w-64 border border-gray-300 p-3 rounded-md shadow-sm">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold">Camadas</h3>
-        <button
-          onClick={handleAddText}
-          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-        >
-          + Texto
-        </button>
-      </div>
-      
-      {selectedLayer?.type === 'text' && (
-        <div className="mb-4">
-          <TextLayer
-            layer={selectedLayer}
-            onUpdate={updateLayer}
-          />
-        </div>
-      )}
+  // Abre o drawer de edição de texto quando uma camada de texto é selecionada
+  useEffect(() => {
+    if (selectedLayer?.type === 'text') {
+      setShowTextDrawer(true);
+    } else {
+      setShowTextDrawer(false);
+    }
+  }, [selectedLayer]);
 
-      <div className="space-y-2">
-        {layers.map((layer) => (
-          <div
-            key={layer.id}
-            className={`p-2 rounded cursor-pointer flex items-center justify-between ${
-              selectedLayerId === layer.id
-                ? 'bg-blue-100 border border-blue-300'
-                : 'hover:bg-gray-100 border border-gray-200'
-            }`}
-            onClick={() => onSelectLayer(layer.id)}
+  return (
+    <>
+      <div className="w-64 border border-gray-300 p-3 rounded-md shadow-sm">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-lg font-semibold">Camadas</h3>
+          <button
+            onClick={handleAddText}
+            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
           >
-            <span className="text-sm truncate">{layer.name}</span>
-            <div className="flex items-center space-x-1">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  moveLayerBackward();
-                }}
-                className="p-1 hover:bg-gray-200 rounded"
-                title="Mover para trás"
-              >
-                ↓
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  moveLayerForward();
-                }}
-                className="p-1 hover:bg-gray-200 rounded"
-                title="Mover para frente"
-              >
-                ↑
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeLayer();
-                }}
-                className="p-1 hover:bg-red-100 text-red-600 rounded"
-                title="Remover camada"
-              >
-                ×
-              </button>
+            + Texto
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          {layers.map((layer) => (
+            <div
+              key={layer.id}
+              className={`p-2 rounded cursor-pointer flex items-center justify-between ${
+                selectedLayerId === layer.id
+                  ? 'bg-blue-100 border border-blue-300'
+                  : 'hover:bg-gray-100 border border-gray-200'
+              }`}
+              onClick={() => onSelectLayer(layer.id)}
+            >
+              <span className="text-sm truncate">{layer.name}</span>
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    moveLayerBackward();
+                  }}
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Mover para trás"
+                >
+                  ↓
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    moveLayerForward();
+                  }}
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Mover para frente"
+                >
+                  ↑
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeLayer();
+                  }}
+                  className="p-1 hover:bg-red-100 text-red-600 rounded"
+                  title="Remover camada"
+                >
+                  ×
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Drawer de edição de texto */}
+      {selectedLayer && (
+        <TextEditorDrawer
+          open={showTextDrawer}
+          onOpenChange={setShowTextDrawer}
+          layer={selectedLayer}
+          onUpdate={updateLayer}
+        />
+      )}
+    </>
   );
 };
 

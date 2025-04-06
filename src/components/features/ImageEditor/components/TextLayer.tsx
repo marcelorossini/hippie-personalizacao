@@ -1,52 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Layer } from '../types/layer';
+import { fontOptions } from '../utils/fontUtils';
 
 interface TextLayerProps {
   layer: Layer;
   onUpdate: (updatedLayer: Layer) => void;
 }
 
-// Lista de fontes do Google Fonts
-const fontOptions = [
-  { value: 'Roboto', label: 'Roboto', preview: 'Roboto' },
-  { value: 'Montserrat', label: 'Montserrat', preview: 'Montserrat' },
-  { value: 'Open Sans', label: 'Open Sans', preview: 'Open Sans' },
-  { value: 'Lato', label: 'Lato', preview: 'Lato' },
-  { value: 'Poppins', label: 'Poppins', preview: 'Poppins' },
-  { value: 'Raleway', label: 'Raleway', preview: 'Raleway' },
-  { value: 'Oswald', label: 'Oswald', preview: 'Oswald' },
-  { value: 'Source Sans Pro', label: 'Source Sans Pro', preview: 'Source Sans Pro' },
-  { value: 'Ubuntu', label: 'Ubuntu', preview: 'Ubuntu' },
-  { value: 'Playfair Display', label: 'Playfair Display', preview: 'Playfair Display' },
-  { value: 'Merriweather', label: 'Merriweather', preview: 'Merriweather' },
-  { value: 'PT Sans', label: 'PT Sans', preview: 'PT Sans' },
-  { value: 'Nunito', label: 'Nunito', preview: 'Nunito' },
-  { value: 'Quicksand', label: 'Quicksand', preview: 'Quicksand' },
-  { value: 'Dancing Script', label: 'Dancing Script', preview: 'Dancing Script' },
-  { value: 'Pacifico', label: 'Pacifico', preview: 'Pacifico' },
-  { value: 'Comfortaa', label: 'Comfortaa', preview: 'Comfortaa' },
-  { value: 'Josefin Sans', label: 'Josefin Sans', preview: 'Josefin Sans' },
-  { value: 'Bebas Neue', label: 'Bebas Neue', preview: 'Bebas Neue' },
-  { value: 'Righteous', label: 'Righteous', preview: 'Righteous' },
-];
-
 const TextLayer: React.FC<TextLayerProps> = ({ layer, onUpdate }) => {
   const [text, setText] = useState(layer.text || '');
   const [fontSize, setFontSize] = useState(layer.fontSize || 24);
   const [color, setColor] = useState(layer.color || '#000000');
   const [fontFamily, setFontFamily] = useState(layer.fontFamily || 'Roboto');
-
-  // Carregar as fontes do Google Fonts
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = `https://fonts.googleapis.com/css2?family=${fontOptions.map(f => f.value.replace(' ', '+')).join('&family=')}&display=swap`;
-    document.head.appendChild(link);
-    
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, []);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
@@ -158,25 +123,6 @@ const TextLayer: React.FC<TextLayerProps> = ({ layer, onUpdate }) => {
               </span>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div className="mt-4 p-3 border border-gray-300 rounded-md bg-gray-50">
-        <p className="text-sm font-medium text-gray-700 mb-2">Prévia:</p>
-        <div 
-          className="p-3 border border-gray-200 rounded bg-white"
-          style={{
-            fontSize: `${fontSize}px`,
-            fontFamily: fontFamily,
-            color: color,
-            minHeight: '60px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}
-        >
-          {text || 'Digite seu texto aqui'}
         </div>
       </div>
     </div>
