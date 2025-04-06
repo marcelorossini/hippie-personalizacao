@@ -24,7 +24,7 @@ export default function VaulDrawer({ children, open, onOpenChange }: VaulDrawerP
             >
               <IoClose size={24} className="text-gray-600" />
             </button>
-            <div className="h-[90vh] overflow-y-auto">
+            <div className="h-[80vh] overflow-y-auto">
               {children}
             </div>
           </div>
