@@ -44,9 +44,9 @@ function App() {
           />
           <label 
             htmlFor="file-upload" 
-            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 text-[#5e160f] hover:text-[#5e160f] font-bold cursor-pointer"
           >
-            <FaPlus /> Enviar imagem
+            <FaPlus /> ENVIAR IMAGEM
           </label>
         </div>
       </div>

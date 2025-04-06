@@ -15,8 +15,8 @@ export const updateDesignAreaSize = (
     const templateAspectRatio = templateImg.naturalWidth / templateImg.naturalHeight;
     
     // Calcula as dimensões máximas permitidas (80% do container)
-    const maxWidth = containerWidth * 0.8;
-    const maxHeight = containerHeight * 0.8;
+    const maxWidth = containerWidth * 0.5;
+    const maxHeight = containerHeight * 0.5;
     
     // Calcula as dimensões mantendo a proporção
     let newWidth = maxWidth;
@@ -29,8 +29,8 @@ export const updateDesignAreaSize = (
     }
     
     // Garante que as dimensões não sejam menores que um valor mínimo
-    const minWidth = 200;
-    const minHeight = 200;
+    const minWidth = 100;
+    const minHeight = 100;
     
     if (newWidth < minWidth) {
       newWidth = minWidth;

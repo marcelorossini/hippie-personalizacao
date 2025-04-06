@@ -74,19 +74,19 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 relative border-2 border-blue-500 overflow-hidden flex items-center justify-center">
-        <div className="relative h-full w-full flex items-center justify-center border-2 border-green-500 overflow-hidden">
+      <div className="flex-1 relative overflow-hidden flex items-center justify-center">
+        <div className="relative h-full w-full flex items-center justify-center overflow-hidden">
           <img
             draggable={false}
             ref={templateImageRef}
-            src="./image.png"
+            src="./template.webp"
             alt="Modelo de Camiseta"
-            className="max-h-full max-w-full object-contain border-2 border-yellow-500"
+            className="max-h-full max-w-full object-contain"
           />
           <div
             id="design-area"
             ref={designAreaRef}
-            className="design-area absolute overflow-hidden select-none border-2 border-purple-500"
+            className="design-area absolute overflow-hidden select-none"
             style={{
               width: `${templateSize.width}px`,
               height: `${templateSize.height}px`,
