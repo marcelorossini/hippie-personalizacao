@@ -134,7 +134,7 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
           </ul>
         </div>
       </div>
-      <ExportButton designAreaRef={designAreaRef} />
+      <ExportButton designAreaRef={designAreaRef} layers={layers} />
     </div>
   );
 };
