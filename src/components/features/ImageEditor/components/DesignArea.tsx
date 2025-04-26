@@ -104,7 +104,7 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
               <DesignItem
                 key={layer.id}
                 id={layer.id}
-                layer={layer}
+                layer={layer as Layer}
                 designAreaRef={designAreaRef}
                 isSelected={selectedLayerId === layer.id}
                 selectLayer={selectLayer}

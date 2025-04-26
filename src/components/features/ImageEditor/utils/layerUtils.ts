@@ -6,6 +6,7 @@ export const createLayerItem = (imgSrc: string, layerCounterRef: React.MutableRe
     id: layerId,
     name: 'Camada ' + layerCounterRef.current++,
     imgSrc,
+    type: 'image',
   };
 };
 

@@ -1,7 +1,6 @@
-import { Layer as BaseLayer } from './layer';
+import type { Layer } from './layer';
 
-// Re-exportar o tipo Layer diretamente do arquivo layer.ts
-export type Layer = BaseLayer;
+export type { Layer };
 
 export interface LayerTransform {
   x: number;
@@ -12,6 +11,6 @@ export interface LayerTransform {
   scale: number;
 }
 
-export interface LayerWithTransform extends BaseLayer {
+export interface LayerWithTransform extends Layer {
   transform: LayerTransform;
 } 

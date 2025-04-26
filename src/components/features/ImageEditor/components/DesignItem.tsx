@@ -6,7 +6,7 @@ import {
     makeRotatable,
     makePinchZoomable
 } from '../utils/dragUtils';
-import { Layer } from '../types/layer';
+import { Layer } from '../types';
 import './DesignItem.css';
 import { FaEdit } from 'react-icons/fa';
 
@@ -336,6 +336,12 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 selectLayer(id);
                 sendLayerToBack();
             }, 700);
+        } else if (e.touches.length === 2) {
+            // Toque duplo para enviar para frente
+            longPressTimerRef.current = window.setTimeout(() => {
+                selectLayer(id);
+                sendLayerToFront();
+            }, 300);
         }
     };
 
@@ -348,6 +354,20 @@ const DesignItem: React.FC<DesignItemProps> = ({
 
     const handleTouchEnd = () => clearLongPress();
     const handleTouchMove = () => clearLongPress();
+
+    // Adicionando função para remover camada com atalho de teclado
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (isSelected && e.key === 'Delete') {
+                removeLayer();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isSelected, removeLayer]);
 
     return (
         <div
