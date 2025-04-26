@@ -15,6 +15,7 @@ interface ExportButtonProps {
 interface OrderData {
   userEmail?: string;
   originId?: string;
+  checkoutId?: string;
   userId?: string;
   size: string;
   color: string;
@@ -45,7 +46,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
       
       const orderData: OrderData = {
         userEmail: urlParams.userEmail || undefined,
-        originId: urlParams.originId || undefined,
+        checkoutId: urlParams.checkoutId || undefined,
         userId: urlParams.userId || undefined,
         size: selectedSize,
         color: 'off-white'
