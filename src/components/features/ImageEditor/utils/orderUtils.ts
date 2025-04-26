@@ -4,7 +4,7 @@ export const getUrlParams = () => {
   const searchParams = new URLSearchParams(window.location.search);
   return {
     productVariantId: searchParams.get('product_variant_id'),
-    checkoutId: searchParams.get('checkout_id'),
+    originId: searchParams.get('checkout_id'),
     userId: searchParams.get('user_id'),
     userEmail: searchParams.get('user_mail'),
     userCpf: searchParams.get('user_cpf'),

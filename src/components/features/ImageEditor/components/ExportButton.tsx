@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { exportLayers } from '../utils/exportUtils';
-import { createOrderFormData, sendOrderToApi } from '../utils/apiUtils';
+import { createOrderFormData, sendOrderToApi } from '../services/orderService';
 import { notifyParentFrame, messageParentFrame, executeJavascriptParentFrame, getUrlParams } from '../utils/orderUtils';
 import LoadingSpinner from './LoadingSpinner';
 import SizeSelector from './SizeSelector';
@@ -14,8 +14,7 @@ interface ExportButtonProps {
 
 interface OrderData {
   userEmail?: string;
-  checkoutId?: string;
-  orderId: string;
+  originId?: string;
   userId?: string;
   size: string;
   color: string;
@@ -46,8 +45,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
       
       const orderData: OrderData = {
         userEmail: urlParams.userEmail || undefined,
-        checkoutId: urlParams.checkoutId || undefined,
-        orderId: '12312123',
+        originId: urlParams.originId || undefined,
         userId: urlParams.userId || undefined,
         size: selectedSize,
         color: 'off-white'

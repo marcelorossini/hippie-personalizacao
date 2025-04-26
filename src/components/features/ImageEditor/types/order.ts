@@ -1,7 +1,6 @@
 export interface OrderData {
   userEmail?: string;
-  checkoutId?: string;
-  orderId: string;
+  originId?: string;
   userId?: string;
   size: string;
   color: string;

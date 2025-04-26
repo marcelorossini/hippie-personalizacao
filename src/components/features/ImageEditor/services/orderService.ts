@@ -14,3 +14,16 @@ export const sendOrderToApi = async (formData: FormData): Promise<any> => {
 
   return response.json();
 }; 
+
+
+export const createOrderFormData = (blob: Blob, orderData: OrderData): FormData => {
+  const formData = new FormData();
+  formData.append('file', blob, 'design.png');
+  formData.append('userEmail', orderData.userEmail || '');
+  formData.append('originId', orderData.originId || '');
+  formData.append('orderId', orderData.orderId);
+  formData.append('userId', orderData.userId || '');
+  formData.append('size', orderData.size);
+  formData.append('color', orderData.color);
+  return formData;
+};
