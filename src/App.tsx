@@ -34,6 +34,20 @@ function App() {
     }
   };
 
+  const handleAddText = () => {
+    const layerId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const newLayer: Layer = {
+      id: layerId,
+      name: 'Texto ' + layerId,
+      type: 'text',
+      text: 'Digite seu texto aqui',
+      fontSize: 24,
+      fontFamily: 'Roboto',
+      color: '#000000'
+    };
+    layerManager.addLayer(newLayer);
+  };
+
   const handleImageSelect = () => {
     setShowMobileGallery(false);
   };
@@ -44,6 +58,7 @@ function App() {
         isLoading={isLoading}
         onFileUpload={onFileUpload}
         onOpenGallery={() => setShowMobileGallery(true)}
+        onAddText={handleAddText}
       />
       <div className="flex-1 overflow-auto">
         <ImageEditor 

@@ -34,7 +34,7 @@ const drawerContentVariants = cva('fixed z-[9999] flex h-auto flex-col bg-white'
 export default function VaulDrawer({ children, open, onOpenChange, direction = 'right' }: VaulDrawerProps) {
   return (
     <DrawerContext.Provider value={{ direction }}>
-      <DrawerPrimitive.Root open={open} onOpenChange={onOpenChange} direction={direction}>
+      <DrawerPrimitive.Root open={open} onOpenChange={onOpenChange} direction={direction} dismissible={false}>
         <DrawerPrimitive.Portal>
           <DrawerPrimitive.Overlay className="fixed inset-0 bg-black/40 z-[9999]" />
           <DrawerPrimitive.Content className={drawerContentVariants({ direction })}>

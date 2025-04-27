@@ -20,6 +20,7 @@ interface ConfirmationModalProps {
   onOpenChange: (open: boolean) => void;
   title: string;
   buttons: ButtonProps[];
+  children?: React.ReactNode;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -27,16 +28,17 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onOpenChange,
   title,
   buttons,
+  children,
 }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const renderButtons = () => (
-    <div className="flex flex-col gap-4 w-full max-w-sm">
+    <div className={`flex ${isDesktop ? 'flex-row gap-4' : 'flex-col gap-4'} w-full ${isDesktop ? 'max-w-none' : 'max-w-sm'}`}>
       {buttons.map((button, index) => (
         <button
           key={index}
           onClick={button.onClick}
-          className={`w-full py-4 px-6 font-bold rounded-md transition-colors ${
+          className={`${isDesktop ? 'flex-1' : 'w-full'} py-4 px-6 font-bold rounded-md transition-colors ${
             button.variant === 'primary'
               ? 'bg-[#74a451] text-white hover:bg-[#5d8a40]'
               : 'bg-white text-[#74a451] border-2 border-[#74a451] hover:bg-gray-50'
@@ -51,14 +53,17 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogOverlay className="bg-white/80 backdrop-blur-sm" />
-        <DialogContent className="sm:max-w-[425px] bg-white shadow-lg rounded-lg">
+        <DialogOverlay className="backdrop-blur-sm" />
+        <DialogContent className="sm:max-w-[600px] bg-white shadow-lg rounded-lg flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center text-gray-800">
               {title}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col items-center gap-6 py-4">
+          <div className="flex-1 overflow-y-auto">
+            {children}
+          </div>
+          <div className="border-t border-gray-200 pt-4">
             {renderButtons()}
           </div>
         </DialogContent>
@@ -68,11 +73,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <VaulDrawer open={open} onOpenChange={onOpenChange} direction="bottom">
-      <div className="flex flex-col items-center gap-6 p-6 bg-white/80 backdrop-blur-sm">
-        <h2 className="text-2xl font-bold text-center text-gray-800">
-          {title}
-        </h2>
-        {renderButtons()}
+      <div className="flex flex-col h-full bg-white/80 backdrop-blur-sm">
+        <div className="flex-1 p-4">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            {title}
+          </h2>
+          {children}
+        </div>
+        <div className="border-t border-gray-200 pt-4">
+          {renderButtons()}
+        </div>
       </div>
     </VaulDrawer>
   );

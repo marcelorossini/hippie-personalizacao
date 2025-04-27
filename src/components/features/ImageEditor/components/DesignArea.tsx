@@ -12,10 +12,12 @@ interface DesignAreaProps {
   setLayers: React.Dispatch<React.SetStateAction<Layer[]>>;
   selectedLayerId: string | null;
   setSelectedLayerId: React.Dispatch<React.SetStateAction<string | null>>;
+  designAreaRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLayerId, setSelectedLayerId }) => {
-  const designAreaRef = useRef<HTMLDivElement>(null);
+const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLayerId, setSelectedLayerId, designAreaRef: externalDesignAreaRef }) => {
+  const internalDesignAreaRef = useRef<HTMLDivElement>(null);
+  const designAreaRef = externalDesignAreaRef || internalDesignAreaRef;
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const layerCounterRef = useRef<number>(1);
   const templateImageRef = useRef<HTMLImageElement>(null);
@@ -104,7 +106,7 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
               <DesignItem
                 key={layer.id}
                 id={layer.id}
-                layer={layer as Layer}
+                layer={layer}
                 designAreaRef={designAreaRef}
                 isSelected={selectedLayerId === layer.id}
                 selectLayer={selectLayer}

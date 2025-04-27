@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DesignArea from '../components/features/ImageEditor/components/DesignArea';
-import LayersPanel from '../components/features/ImageEditor/components/LayersPanel';
 import ImageGallery from '../components/features/ImageGallery';
 import VaulDrawer from '../components/common/ui/Drawer';
 import { Layer } from '../components/features/ImageEditor/types/layer';
 import { Dispatch, SetStateAction } from 'react';
+import TextEditorDrawer from '../components/features/ImageEditor/components/TextEditorDrawer';
+import ExportButton from '../components/features/ImageEditor/components/ExportButton';
 
 interface LayerManager {
   layers: Layer[];
@@ -25,7 +26,7 @@ interface ImageEditorProps {
   showMobileGallery?: boolean;
 }
 
-const ImageEditor: React.FC<ImageEditorProps> = ({ 
+const ImageEditor: React.FC<ImageEditorProps> = ({
   layerManager,
   onImageSelect,
   showMobileGallery = false
@@ -43,6 +44,19 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     addLayer,
   } = layerManager;
 
+  const [showTextDrawer, setShowTextDrawer] = useState(false);
+  const selectedLayer = layers.find(layer => layer.id === selectedLayerId);
+  const designAreaRef = useRef<HTMLDivElement>(null);
+
+  // Abre o drawer de edição de texto quando uma camada de texto é selecionada
+  useEffect(() => {
+    if (selectedLayer?.type === 'text') {
+      setShowTextDrawer(true);
+    } else {
+      setShowTextDrawer(false);
+    }
+  }, [selectedLayer]);
+
   const handleImageSelect = (imageUrl: string) => {
     const layerId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     addLayer({
@@ -55,43 +69,37 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   };
 
   const updateLayer = (updatedLayer: Layer) => {
-    setLayers(prev => prev.map(layer => 
+    setLayers(prev => prev.map(layer =>
       layer.id === updatedLayer.id ? updatedLayer : layer
     ));
   };
 
   return (
     <div className="w-full h-full flex flex-col md:flex-row gap-5 p-5">
-      <div className="flex flex-col gap-4">
-        <LayersPanel
-          layers={layers}
-          selectedLayerId={selectedLayerId}
-          onSelectLayer={(id) => setSelectedLayerId(id)}
-          moveLayerForward={moveLayerForward}
-          moveLayerBackward={moveLayerBackward}
-          sendLayerToFront={sendLayerToFront}
-          sendLayerToBack={sendLayerToBack}
-          removeLayer={removeLayer}
-          addLayer={addLayer}
-          updateLayer={updateLayer}
-        />
-      </div>
       <div className="flex-1 flex items-center justify-center">
         <DesignArea
           layers={layers}
           setLayers={setLayers}
           selectedLayerId={selectedLayerId}
           setSelectedLayerId={setSelectedLayerId}
+          designAreaRef={designAreaRef}
         />
       </div>
       {/* Galeria lateral visível apenas em desktop */}
-      <div className="hidden md:block w-64 border-l border-gray-200 p-4 overflow-y-auto">
+      <div className="hidden md:flex w-64 border-l border-gray-200 px-4 flex-col h-full">
         <h3 className="text-lg font-semibold mb-4 text-[#5e160f]">Figurinhas da Hippie</h3>
-        <ImageGallery onImageSelect={handleImageSelect} />
+
+        <div className="flex-1 overflow-auto">
+          <ImageGallery onImageSelect={handleImageSelect} />
+        </div>
+
+        <div className="mt-4 border-t border-gray-200 bg-white">
+          <ExportButton designAreaRef={designAreaRef} layers={layers} />
+        </div>
       </div>
       {/* Drawer para galeria em mobile */}
-      <VaulDrawer 
-        open={showMobileGallery} 
+      <VaulDrawer
+        open={showMobileGallery}
         onOpenChange={() => onImageSelect?.('')}
       >
         <div className="flex flex-col h-full">
@@ -103,6 +111,16 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
           </div>
         </div>
       </VaulDrawer>
+
+      {/* Drawer de edição de texto */}
+      {selectedLayer && (
+        <TextEditorDrawer
+          open={showTextDrawer}
+          onOpenChange={setShowTextDrawer}
+          layer={selectedLayer}
+          onUpdate={updateLayer}
+        />
+      )}
     </div>
   );
 };

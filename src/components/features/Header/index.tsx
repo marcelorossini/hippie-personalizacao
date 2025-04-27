@@ -5,20 +5,14 @@ interface HeaderProps {
   isLoading: boolean;
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onOpenGallery: () => void;
+  onAddText: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isLoading, onFileUpload, onOpenGallery }) => {
+const Header: React.FC<HeaderProps> = ({ isLoading, onFileUpload, onOpenGallery, onAddText }) => {
   return (
-    <div className="flex justify-between items-center p-4 z-10">
-      <h2 className="text-[#5e160f] font-bold text-2xl">Personalize sua camiseta</h2>
-      <div className="flex gap-4 justify-end">
-        {/* Botão de galeria visível apenas em mobile */}
-        <button
-          onClick={onOpenGallery}
-          className="md:hidden px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Abrir Galeria
-        </button>
+    <div className="flex flex-col sm:flex-row justify-between items-center p-3 sm:p-4 z-10 gap-3 sm:gap-0">
+      <h2 className="text-[#5e160f] font-bold text-xl sm:text-2xl text-center sm:text-left">Personalize sua camiseta</h2>
+      <div className="flex gap-2 sm:gap-4 justify-center sm:justify-end w-full sm:w-auto">
         <input
           id="file-upload"
           type="file"
@@ -28,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ isLoading, onFileUpload, onOpenGallery 
         />
         <label 
           htmlFor="file-upload" 
-          className="flex items-center gap-2 px-4 py-2 text-[#5e160f] hover:text-[#5e160f] font-bold cursor-pointer relative"
+          className="flex items-center gap-2 px-3 py-2 text-[#5e160f] hover:text-[#5e160f] font-bold cursor-pointer relative text-sm sm:text-base"
         >
           <FaPlus /> ENVIAR IMAGEM
           {isLoading && (
@@ -37,6 +31,21 @@ const Header: React.FC<HeaderProps> = ({ isLoading, onFileUpload, onOpenGallery 
             </div>
           )}
         </label>
+        <button
+          onClick={onAddText}
+          className="flex items-center gap-2 px-3 py-2 text-[#5e160f] hover:text-[#5e160f] font-bold cursor-pointer text-sm sm:text-base"
+        >
+          <FaPlus /> TEXTO
+        </button>
+        {/* Botão de galeria visível apenas em mobile */}
+        <div className="md:hidden">
+          <button
+            onClick={onOpenGallery}
+            className="flex items-center gap-2 px-3 py-2 text-[#5e160f] hover:text-[#5e160f] font-bold cursor-pointer text-sm sm:text-base"
+          >
+            <FaPlus /> GALERIA
+          </button>
+        </div>
       </div>
     </div>
   );

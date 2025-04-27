@@ -26,24 +26,40 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSizeModal, setShowSizeModal] = useState(false);
 
   const handleExport = async () => {
     if (layers.length === 0) {
       messageParentFrame('Atenção', 'Adicione pelo menos uma imagem antes de colocar na mochila', true);
       return;
     }
+    
+    setShowSizeModal(true);
+  };
 
+  const handleSizeConfirm = () => {
     if (!selectedSize) {
       setShowError(true);
       messageParentFrame('Atenção', 'Selecione um tamanho antes de colocar na mochila', true);
       return;
     }
-    
+    setShowSizeModal(false);
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmExport = async () => {
+    setShowConfirmDialog(false);
     try {
       setIsLoading(true);
       const blob = await exportLayers(designAreaRef);
       const urlParams = getUrlParams();
       
+      if (!selectedSize) {
+        messageParentFrame('Erro', 'Tamanho não selecionado', true);
+        return;
+      }
+
       const orderData: OrderData = {
         userEmail: urlParams.userEmail || undefined,
         checkoutId: urlParams.checkoutId || undefined,
@@ -84,22 +100,44 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
   return (
     <>
       <LoadingSpinner isLoading={isLoading} />
-      <div className="mt-4 p-4 flex flex-row gap-4 items-end justify-between">
-        <SizeSelector 
-          selectedSize={selectedSize} 
-          onSizeChange={handleSizeChange}
-          showError={showError}
-        />
-        <div className="flex justify-end">
+      <div className="mt-4 flex flex-col lg:flex-row items-end justify-center lg:justify-between gap-4">
+        <div className="flex justify-end w-full lg:w-fit hidden lg:hidden">
           <button
             onClick={handleExport}
-            className="border-none bg-[#74a451] rounded-[5px] h-16 flex items-center justify-center w-56 px-5 font-bold uppercase cursor-pointer text-white text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full text-nowrap border-none bg-[#74a451] rounded-[5px] h-16 flex items-center justify-center w-56 px-5 font-bold uppercase cursor-pointer text-white text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? 'PROCESSANDO...' : 'COLOCAR NA MOCHILA'}
           </button>
         </div>
       </div>
+
+      <ConfirmationModal
+        open={showSizeModal}
+        onOpenChange={setShowSizeModal}
+        title="Selecione o tamanho"
+        buttons={[
+          {
+            label: "Confirmar",
+            onClick: handleSizeConfirm,
+            variant: "primary"
+          },
+          {
+            label: "Cancelar",
+            onClick: () => setShowSizeModal(false),
+            variant: "secondary"
+          }
+        ]}
+      >
+        <div className="">
+          <SizeSelector 
+            selectedSize={selectedSize} 
+            onSizeChange={handleSizeChange}
+            showError={showError}
+          />
+        </div>
+      </ConfirmationModal>
+
       <ConfirmationModal
         open={showConfirmation}
         onOpenChange={setShowConfirmation}
@@ -113,6 +151,24 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
           {
             label: "Ir para o Carrinho",
             onClick: handleGoToCart,
+            variant: "secondary"
+          }
+        ]}
+      />
+
+      <ConfirmationModal
+        open={showConfirmDialog}
+        onOpenChange={setShowConfirmDialog}
+        title="Confirmar ação"
+        buttons={[
+          {
+            label: "SIM",
+            onClick: handleConfirmExport,
+            variant: "primary"
+          },
+          {
+            label: "NÃO",
+            onClick: () => setShowConfirmDialog(false),
             variant: "secondary"
           }
         ]}
