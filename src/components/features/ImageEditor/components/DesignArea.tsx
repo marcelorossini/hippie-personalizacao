@@ -6,6 +6,7 @@ import { handleFileUpload } from '../utils/imageUtils';
 import { createLayerItem, sendLayerToBack, sendLayerToFront, removeLayer } from '../utils/layerUtils';
 import { showContextMenu, hideContextMenu } from '../utils/contextMenuUtils';
 import { updateDesignAreaSize } from '../utils/sizeUtils';
+import TextEditorDrawer from './TextEditorDrawer';
 
 interface DesignAreaProps {
   layers: Layer[];
@@ -22,6 +23,7 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
   const layerCounterRef = useRef<number>(1);
   const templateImageRef = useRef<HTMLImageElement>(null);
   const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
+  const [showTextDrawer, setShowTextDrawer] = useState(false);
 
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const dataUrl = await handleFileUpload(event);
@@ -74,6 +76,8 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
     };
   }, []);
 
+  const selectedLayer = layers.find(layer => layer.id === selectedLayerId);
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 relative overflow-hidden flex items-center justify-center">
@@ -114,6 +118,12 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
                 sendLayerToBack={() => sendLayerToBack(layers, selectedLayerId, setLayers)}
                 sendLayerToFront={() => sendLayerToFront(layers, selectedLayerId, setLayers)}
                 removeLayer={() => removeLayer(selectedLayerId, setLayers, setSelectedLayerId)}
+                onEditText={() => {
+                  if (layer.type === 'text') {
+                    setSelectedLayerId(layer.id);
+                    setShowTextDrawer(true);
+                  }
+                }}
               />
             ))}
           </div>
@@ -137,6 +147,22 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
         </div>
       </div>
       <ExportButton designAreaRef={designAreaRef} layers={layers} />
+
+      {/* Drawer de edição de texto */}
+      {selectedLayer && selectedLayer.type === 'text' && (
+        <TextEditorDrawer
+          open={showTextDrawer}
+          onOpenChange={setShowTextDrawer}
+          layer={selectedLayer}
+          onUpdate={(updatedLayer) => {
+            setLayers(prevLayers => 
+              prevLayers.map(layer => 
+                layer.id === updatedLayer.id ? updatedLayer : layer
+              )
+            );
+          }}
+        />
+      )}
     </div>
   );
 };

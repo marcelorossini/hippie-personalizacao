@@ -97,15 +97,6 @@ const LayersPanel: React.FC<LayersPanelProps> = ({
 
   const selectedLayer = layers.find(layer => layer.id === selectedLayerId);
 
-  // Abre o drawer de edição de texto quando uma camada de texto é selecionada
-  useEffect(() => {
-    if (selectedLayer?.type === 'text') {
-      setShowTextDrawer(true);
-    } else {
-      setShowTextDrawer(false);
-    }
-  }, [selectedLayer]);
-
   return (
     <>
       <div className="w-64 border border-gray-300 p-3 rounded-md shadow-sm">

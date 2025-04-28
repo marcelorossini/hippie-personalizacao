@@ -30,10 +30,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   buttons,
   children,
 }) => {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const renderButtons = () => (
-    <div className={`flex ${isDesktop ? 'flex-row gap-4' : 'flex-col gap-4'} w-full ${isDesktop ? 'max-w-none' : 'max-w-sm'}`}>
+    <div className={`flex ${isDesktop ? 'flex-row gap-4' : 'flex-col gap-4'} w-full ${isDesktop ? 'max-w-none' : 'max-w-full'}`}>
       {buttons.map((button, index) => (
         <button
           key={index}
@@ -80,7 +80,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </h2>
           {children}
         </div>
-        <div className="border-t border-gray-200 pt-4">
+        <div className="border-t border-gray-200 pt-4 px-4">
           {renderButtons()}
         </div>
       </div>

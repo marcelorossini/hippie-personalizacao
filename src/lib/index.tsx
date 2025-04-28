@@ -48,15 +48,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   const selectedLayer = layers.find(layer => layer.id === selectedLayerId);
   const designAreaRef = useRef<HTMLDivElement>(null);
 
-  // Abre o drawer de edição de texto quando uma camada de texto é selecionada
-  useEffect(() => {
-    if (selectedLayer?.type === 'text') {
-      setShowTextDrawer(true);
-    } else {
-      setShowTextDrawer(false);
-    }
-  }, [selectedLayer]);
-
   const handleImageSelect = (imageUrl: string) => {
     const layerId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     addLayer({
@@ -75,7 +66,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col md:flex-row gap-5 p-5">
+    <div className="w-full h-full flex flex-col md:flex-row gap-4">
       <div className="flex-1 flex items-center justify-center">
         <DesignArea
           layers={layers}

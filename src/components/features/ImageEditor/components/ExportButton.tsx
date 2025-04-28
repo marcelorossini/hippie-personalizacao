@@ -28,11 +28,20 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showSizeModal, setShowSizeModal] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleExport = async () => {
     if (layers.length === 0) {
       messageParentFrame('Atenção', 'Adicione pelo menos uma imagem antes de colocar na mochila', true);
       return;
+    }
+    
+    try {
+      const blob = await exportLayers(designAreaRef);
+      const previewUrl = URL.createObjectURL(blob);
+      setPreviewImage(previewUrl);
+    } catch (error) {
+      console.error('Erro ao gerar preview:', error);
     }
     
     setShowSizeModal(true);
@@ -100,8 +109,8 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
   return (
     <>
       <LoadingSpinner isLoading={isLoading} />
-      <div className="mt-4 flex flex-col lg:flex-row items-end justify-center lg:justify-between gap-4">
-        <div className="flex justify-end w-full lg:w-fit hidden lg:hidden">
+      <div className="mt-4 flex flex-col lg:flex-row items-end justify-center lg:justify-between gap-4 p-4">
+        <div className="flex justify-end w-full lg:w-fit">
           <button
             onClick={handleExport}
             className="w-full text-nowrap border-none bg-[#74a451] rounded-[5px] h-16 flex items-center justify-center w-56 px-5 font-bold uppercase cursor-pointer text-white text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -159,7 +168,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
       <ConfirmationModal
         open={showConfirmDialog}
         onOpenChange={setShowConfirmDialog}
-        title="Confirmar ação"
+        title="Confirma o design da camiseta?"
         buttons={[
           {
             label: "SIM",
@@ -172,7 +181,21 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
             variant: "secondary"
           }
         ]}
-      />
+      >
+        <div className="text-center text-gray-600 mb-4">
+          ⚡ Atenção: depois de confirmado, não tem mais volta! 🎯<br/>Capriche na imagem porque não rola editar depois. 🖼️🚫
+        </div>
+        {previewImage && (
+          <div className="flex justify-center mb-4">
+            <img 
+              src={previewImage} 
+              alt="Preview do design" 
+              className="max-w-full h-auto rounded-lg shadow-lg"
+              style={{ maxHeight: '300px' }}
+            />
+          </div>
+        )}
+      </ConfirmationModal>
     </>
   );
 };

@@ -1,12 +1,11 @@
 .design-item {
-  position: absolute;
+  position: relative;
   cursor: move;
   user-select: none;
 }
 
 .design-item.selected {
   outline: 2px solid #3b82f6;
-  outline-offset: 2px;
 }
 
 .rotate-handle,

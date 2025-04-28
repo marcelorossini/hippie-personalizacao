@@ -5,7 +5,7 @@ const validateImageDimensions = (file: File): Promise<{ isValid: boolean; width:
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
-      const isValid = img.width >= 1000 && img.height >= 1000;
+      const isValid = img.width >= 800 && img.height >= 800;
       console.log('Dimensões da imagem:', { width: img.width, height: img.height });
       resolve({ isValid, width: img.width, height: img.height });
     };
@@ -18,7 +18,7 @@ const validateImageDimensions = (file: File): Promise<{ isValid: boolean; width:
     // Limpa o object URL após o carregamento
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
-      const isValid = img.width >= 1000 && img.height >= 1000;
+      const isValid = img.width >= 800 && img.height >= 800;
       console.log('Dimensões da imagem:', { width: img.width, height: img.height });
       resolve({ isValid, width: img.width, height: img.height });
     };
@@ -58,7 +58,7 @@ export const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement
     console.log('Resultado da validação:', { isValid, width, height });
     
     if (!isValid) {
-      alert(`Erro: A imagem deve ter dimensões mínimas de 1000x1000 pixels.\nDimensões atuais: ${width}x${height} pixels`);
+      alert(`Erro: A imagem deve ter dimensões mínimas de 800x800 pixels.\nDimensões atuais: ${width}x${height} pixels`);
       return null;
     }
 

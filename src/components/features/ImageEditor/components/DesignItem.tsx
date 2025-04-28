@@ -8,7 +8,7 @@ import {
 } from '../utils/dragUtils';
 import { Layer } from '../types';
 import './DesignItem.css';
-import { FaEdit } from 'react-icons/fa';
+import LayerOptionsPopover from './LayerOptionsPopover';
 
 interface DesignItemProps {
     id: string;
@@ -44,6 +44,8 @@ const DesignItem: React.FC<DesignItemProps> = ({
     const [userDefinedPosition, setUserDefinedPosition] = useState<{ top: number, left: number } | null>(null);
     const [isUserModified, setIsUserModified] = useState(false);
     const [currentScale, setCurrentScale] = useState(1);
+    const [popoverPosition, setPopoverPosition] = useState<{ top: number, left: number } | null>(null);
+    const [popoverWidth, setPopoverWidth] = useState(0);
 
     // Função para calcular o tamanho ideal do elemento
     const calculateIdealSize = (designWidth: number, designHeight: number, elementWidth: number, elementHeight: number) => {
@@ -312,6 +314,19 @@ const DesignItem: React.FC<DesignItemProps> = ({
         }
         
         selectLayer(id);
+        
+        // Adiciona listeners para atualizar a posição do popover durante o arrasto
+        const handleMouseMove = () => {
+            updatePopoverPosition();
+        };
+        
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
     };
 
     const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -336,6 +351,19 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 selectLayer(id);
                 sendLayerToBack();
             }, 700);
+            
+            // Adiciona listeners para atualizar a posição do popover durante o arrasto
+            const handleTouchMove = () => {
+                updatePopoverPosition();
+            };
+            
+            const handleTouchEnd = () => {
+                document.removeEventListener('touchmove', handleTouchMove);
+                document.removeEventListener('touchend', handleTouchEnd);
+            };
+            
+            document.addEventListener('touchmove', handleTouchMove);
+            document.addEventListener('touchend', handleTouchEnd);
         } else if (e.touches.length === 2) {
             // Toque duplo para enviar para frente
             longPressTimerRef.current = window.setTimeout(() => {
@@ -369,14 +397,71 @@ const DesignItem: React.FC<DesignItemProps> = ({
         };
     }, [isSelected, removeLayer]);
 
+    // Função para atualizar a posição do popover
+    const updatePopoverPosition = () => {
+        if (containerRef.current && isSelected) {
+            const rect = containerRef.current.getBoundingClientRect();
+            setPopoverPosition({
+                top: rect.top - 40, // 40px acima da layer
+                left: rect.left + (rect.width / 2) - (popoverWidth / 2) // Centralizado horizontalmente
+            });
+        } else {
+            setPopoverPosition(null);
+        }
+    };
+
+    // Atualiza a posição do popover quando o item é selecionado ou movido
+    useEffect(() => {
+        if (isSelected) {
+            updatePopoverPosition();
+            
+            // Adiciona um listener para atualizar a posição quando a janela é redimensionada
+            window.addEventListener('resize', updatePopoverPosition);
+            window.addEventListener('scroll', updatePopoverPosition);
+            
+            // Adiciona um MutationObserver para detectar mudanças no estilo do elemento
+            if (containerRef.current) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && 
+                            (mutation.attributeName === 'style' || 
+                             mutation.attributeName === 'class')) {
+                            updatePopoverPosition();
+                        }
+                    });
+                });
+                
+                observer.observe(containerRef.current, { 
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
+                
+                return () => {
+                    observer.disconnect();
+                    window.removeEventListener('resize', updatePopoverPosition);
+                    window.removeEventListener('scroll', updatePopoverPosition);
+                };
+            }
+        } else {
+            setPopoverPosition(null);
+        }
+    }, [isSelected, position]);
+
+    // Atualiza a posição quando a largura do popover mudar
+    useEffect(() => {
+        updatePopoverPosition();
+    }, [popoverWidth]);
+
     return (
         <div
             ref={containerRef}
-            className={`design-item absolute ${isSelected ? 'selected' : ''}`}
+            className={`design-item ${isSelected ? 'selected' : ''}`}
             style={{
+                position: 'absolute',
                 top: `${position.top}px`,
                 left: `${position.left}px`,
                 transform: `scale(${currentScale})`,
+                transformOrigin: 'center center'
             }}
             onMouseDown={handleMouseDown}
             onContextMenu={handleContextMenu}
@@ -385,68 +470,40 @@ const DesignItem: React.FC<DesignItemProps> = ({
             onTouchMove={handleTouchMove}
         >
             {layer.type === 'text' ? (
-                <div
-                    className="design-text"
-                    style={{
-                        fontSize: `${layer.fontSize || 24}px`,
-                        fontFamily: layer.fontFamily || 'Arial',
-                        color: layer.color || '#000000',
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        userSelect: 'none',
-                        whiteSpace: 'pre-wrap',
-                        wordBreak: 'break-word',
-                        textAlign: 'center',
-                    }}
-                >
-                    {layer.text || 'Digite seu texto aqui'}
+                <div className="design-text" style={{ 
+                    fontSize: `${layer.fontSize}px`,
+                    fontFamily: layer.fontFamily,
+                    color: layer.color
+                }}>
+                    {layer.text}
                 </div>
             ) : (
                 <img
                     src={layer.imgSrc}
-                    alt="Design"
+                    alt={layer.name}
                     className="design-image"
                     draggable={false}
                 />
             )}
+
             {isSelected && (
                 <>
-                    <ResizeHandle 
-                        className="resize-handle" 
-                        onMouseDown={(e) => {
-                            e.stopPropagation();
-                            const handle = e.currentTarget;
-                            const imgEl = containerRef.current?.querySelector('img');
-                            if (imgEl instanceof HTMLImageElement && handle instanceof HTMLElement) {
-                                makeResizable(containerRef.current!, imgEl, handle, designAreaRef);
-                            }
-                        }}
-                    />
-                    <RotateHandle 
-                        className="rotate-handle" 
-                        onMouseDown={(e) => {
-                            e.stopPropagation();
-                            const handle = e.currentTarget;
-                            if (handle instanceof HTMLElement) {
-                                makeRotatable(containerRef.current!, handle);
-                            }
-                        }}
-                    />
-                    {layer.type === 'text' && onEditText && (
-                        <div 
-                            className="edit-handle"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onEditText();
-                            }}
-                        >
-                            <FaEdit size={24} />
-                        </div>
-                    )}
+                    <ResizeHandle />
+                    <RotateHandle />
                 </>
+            )}
+            
+            {/* Renderiza o popover como um portal fora do design-area */}
+            {isSelected && popoverPosition && (
+                <LayerOptionsPopover
+                    layer={layer}
+                    position={popoverPosition}
+                    onEditText={onEditText}
+                    onSendToFront={sendLayerToFront}
+                    onSendToBack={sendLayerToBack}
+                    onRemove={removeLayer}
+                    onWidthChange={setPopoverWidth}
+                />
             )}
         </div>
     );
