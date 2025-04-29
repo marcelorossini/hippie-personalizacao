@@ -4,7 +4,6 @@ import ExportButton from './ExportButton';
 import { Layer } from '../types';
 import { handleFileUpload } from '../utils/imageUtils';
 import { createLayerItem, sendLayerToBack, sendLayerToFront, removeLayer } from '../utils/layerUtils';
-import { showContextMenu, hideContextMenu } from '../utils/contextMenuUtils';
 import { updateDesignAreaSize } from '../utils/sizeUtils';
 import TextEditorDrawer from './TextEditorDrawer';
 
@@ -37,21 +36,7 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
     setSelectedLayerId(layerId);
   };
 
-  useEffect(() => {
-    const handleGlobalClick = (e: MouseEvent) => {
-      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
-        hideContextMenu(contextMenuRef);
-      }
-    };
-    window.addEventListener('click', handleGlobalClick);
-    window.addEventListener('scroll', () => hideContextMenu(contextMenuRef));
-    window.addEventListener('resize', () => hideContextMenu(contextMenuRef));
-    return () => {
-      window.removeEventListener('click', handleGlobalClick);
-      window.removeEventListener('scroll', () => hideContextMenu(contextMenuRef));
-      window.removeEventListener('resize', () => hideContextMenu(contextMenuRef));
-    };
-  }, []);
+
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
@@ -114,7 +99,6 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
                 designAreaRef={designAreaRef}
                 isSelected={selectedLayerId === layer.id}
                 selectLayer={selectLayer}
-                showContextMenu={(x, y) => showContextMenu(contextMenuRef, x, y)}
                 sendLayerToBack={() => sendLayerToBack(layers, selectedLayerId, setLayers)}
                 sendLayerToFront={() => sendLayerToFront(layers, selectedLayerId, setLayers)}
                 removeLayer={() => removeLayer(selectedLayerId, setLayers, setSelectedLayerId)}
@@ -146,7 +130,9 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
           </ul>
         </div>
       </div>
+      <div className="w-full md:hidden">
       <ExportButton designAreaRef={designAreaRef} layers={layers} />
+      </div>
 
       {/* Drawer de edição de texto */}
       {selectedLayer && selectedLayer.type === 'text' && (

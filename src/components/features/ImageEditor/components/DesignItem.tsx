@@ -16,7 +16,6 @@ interface DesignItemProps {
     designAreaRef: React.RefObject<HTMLDivElement | null>;
     isSelected: boolean;
     selectLayer: (layerId: string) => void;
-    showContextMenu: (x: number, y: number) => void;
     sendLayerToBack: () => void;
     sendLayerToFront: () => void;
     removeLayer: () => void;
@@ -29,7 +28,6 @@ const DesignItem: React.FC<DesignItemProps> = ({
     designAreaRef,
     isSelected,
     selectLayer,
-    showContextMenu,
     sendLayerToBack,
     sendLayerToFront,
     removeLayer,
@@ -251,8 +249,20 @@ const DesignItem: React.FC<DesignItemProps> = ({
             if (imgEl instanceof HTMLImageElement) {
                 makePinchZoomable(containerRef.current, imgEl, designAreaRef);
             }
+            
+            // Aplica as funcionalidades de resize e rotate
+            const resizeHandle = containerRef.current.querySelector('.resize-handle');
+            const rotateHandle = containerRef.current.querySelector('.rotate-handle');
+            
+            if (resizeHandle instanceof HTMLElement && imgEl instanceof HTMLImageElement) {
+                makeResizable(containerRef.current, imgEl, resizeHandle, designAreaRef);
+            }
+            
+            if (rotateHandle instanceof HTMLElement) {
+                makeRotatable(containerRef.current, rotateHandle);
+            }
         }
-    }, [designAreaRef]);
+    }, [designAreaRef, isSelected]);
 
     // Efeito para detectar mudanças na posição e tamanho definidos pelo usuário
     useEffect(() => {
@@ -327,13 +337,6 @@ const DesignItem: React.FC<DesignItemProps> = ({
         
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        selectLayer(id);
-        showContextMenu(e.pageX, e.pageY);
     };
 
     const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -464,7 +467,6 @@ const DesignItem: React.FC<DesignItemProps> = ({
                 transformOrigin: 'center center'
             }}
             onMouseDown={handleMouseDown}
-            onContextMenu={handleContextMenu}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}

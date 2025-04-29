@@ -44,12 +44,14 @@ export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefOb
     let newLeft = initialLeft + dx;
     let newTop = initialTop + dy;
     if (designAreaRef.current) {
-      const limitLeft = designAreaRef.current.offsetWidth - startContainerWidth;
-      const auxLeft = designAreaRef.current.offsetWidth - container.offsetWidth;
+      // Adiciona um pequeno padding para garantir que a borda de seleção permaneça visível
+      const padding = 2; // Largura da borda de seleção
+      const limitLeft = designAreaRef.current.offsetWidth - startContainerWidth - padding;
+      const auxLeft = designAreaRef.current.offsetWidth - container.offsetWidth - padding;
       const maxLeft = auxLeft >= limitLeft ? limitLeft : auxLeft;
-      const maxTop = designAreaRef.current.offsetHeight - container.offsetHeight;
-      newLeft = Math.max(0, Math.min(newLeft, maxLeft));
-      newTop = Math.max(0, Math.min(newTop, maxTop));
+      const maxTop = designAreaRef.current.offsetHeight - container.offsetHeight - padding;
+      newLeft = Math.max(padding, Math.min(newLeft, maxLeft));
+      newTop = Math.max(padding, Math.min(newTop, maxTop));
     }
     container.style.left = newLeft + 'px';
     container.style.top = newTop + 'px';
@@ -111,8 +113,10 @@ export const makeResizable = (container: HTMLElement, image: HTMLImageElement, h
     let maxHeight = newWidth;
     
     if (designAreaRef.current) {
-      maxWidth = designAreaRef.current.offsetWidth - currentLeft;
-      maxHeight = designAreaRef.current.offsetHeight - currentTop;
+      // Adiciona um pequeno padding para garantir que a borda de seleção permaneça visível
+      const padding = 2; // Largura da borda de seleção
+      maxWidth = designAreaRef.current.offsetWidth - currentLeft - padding;
+      maxHeight = designAreaRef.current.offsetHeight - currentTop - padding;
     }
     
     // Garante que a largura não exceda o máximo permitido
@@ -259,8 +263,10 @@ export const makePinchZoomable = (container: HTMLElement, image: HTMLImageElemen
     let maxHeight = newHeight;
     
     if (designAreaRef.current) {
-      maxWidth = designAreaRef.current.offsetWidth - currentLeft;
-      maxHeight = designAreaRef.current.offsetHeight - currentTop;
+      // Adiciona um pequeno padding para garantir que a borda de seleção permaneça visível
+      const padding = 2; // Largura da borda de seleção
+      maxWidth = designAreaRef.current.offsetWidth - currentLeft - padding;
+      maxHeight = designAreaRef.current.offsetHeight - currentTop - padding;
     }
     
     // Garante que a largura não exceda o máximo permitido

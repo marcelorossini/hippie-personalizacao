@@ -11,7 +11,7 @@ export const RotateHandle: React.FC<HandleProps> = ({ onMouseDown, className }) 
         className={`rotate-handle ${className || ''}`}
         onMouseDown={onMouseDown}
     >
-        <FaSync size={28} />
+        <FaSync size={28} className='hidden lg:block'/>
     </div>
 );
 
@@ -20,6 +20,6 @@ export const ResizeHandle: React.FC<HandleProps> = ({ onMouseDown, className }) 
         className={`resize-handle ${className || ''}`}
         onMouseDown={onMouseDown}
     >
-        <FaExpand size={28} />
+        <FaExpand size={28} className='hidden lg:block'/>
     </div>
 );

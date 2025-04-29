@@ -15,6 +15,19 @@ function App() {
     loadGoogleFonts();
   }, []);
 
+  // Bloqueia o clique com o botão direito em todo o aplicativo
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsLoading(true);
     try {

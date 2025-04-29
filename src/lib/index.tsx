@@ -77,7 +77,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
         />
       </div>
       {/* Galeria lateral visível apenas em desktop */}
-      <div className="hidden md:flex w-64 border-l border-gray-200 px-4 flex-col h-full">
+      <div className="hidden md:flex w-80 border-l border-gray-200 px-4 flex-col h-full">
         <h3 className="text-lg font-semibold mb-4 text-[#5e160f]">Figurinhas da Hippie</h3>
 
         <div className="flex-1 overflow-auto">

@@ -6,14 +6,17 @@ export const updateDesignAreaSize = (
   if (templateImageRef.current && designAreaRef.current) {
     const templateImg = templateImageRef.current;
     const designArea = designAreaRef.current;
-    
+    const templateImgParent = templateImg.parentElement;
+    const templateWidth = templateImgParent?.clientWidth || 0;
+    const templateHeight = templateImg?.clientHeight || 0;
+    //console.log(templateWidth, templateHeight);
     // Obtém as dimensões do container pai
     const containerWidth = designArea.parentElement?.clientWidth || 0;
     const containerHeight = designArea.parentElement?.clientHeight || 0;
     
     // Calcula a proporção da imagem template
-    const templateAspectRatio = templateImg.naturalWidth / templateImg.naturalHeight;
-    
+    const templateAspectRatio = templateWidth / templateHeight;
+
     // Calcula as dimensões máximas permitidas (80% do container)
     const maxWidth = containerWidth * 0.5;
     const maxHeight = containerHeight * 0.5;
@@ -29,17 +32,19 @@ export const updateDesignAreaSize = (
     }
     
     // Garante que as dimensões não sejam menores que um valor mínimo
-    const minWidth = 100;
-    const minHeight = 100;
+    const minWidth = 200;
+    const minHeight = 200;
     
     if (newWidth < minWidth) {
       newWidth = minWidth;
       newHeight = newWidth / templateAspectRatio;
+
     }
     
     if (newHeight < minHeight) {
       newHeight = minHeight;
       newWidth = newHeight * templateAspectRatio;
+      console.log(newWidth, newHeight, templateAspectRatio)
     }
     
     // Atualiza o tamanho da área de design
