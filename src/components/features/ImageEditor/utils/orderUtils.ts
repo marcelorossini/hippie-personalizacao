@@ -25,10 +25,43 @@ export const createOrderFormData = (blob: Blob, orderData: OrderData): FormData 
   return formData;
 };
 
-export const notifyParentFrame = (productVariantId: string | null) => {
+export const notifyParentFrame = (productVariantId: string | null, quantity: number = 1) => {
   if (window.top && productVariantId) {
     window.top.postMessage(`
-      addToCartClick(${productVariantId})
+      (async () => {
+        try {
+          let product = getAttributeProductAndQuantity(${productVariantId})
+          product[0].quantity = ${quantity}
+          const checkout = await addOrCreateCheckout(product)
+          if (!checkout) {
+            showOverlay("Ocorreu um erro!", "Erro ao adicionar produto ao carrinho.", !0);
+            return;
+          }
+          await loadMiniCart()        
+          carregaCamisetasPersonalizadasMinicart();
+          
+          // Envia mensagem de confirmação para todos os iframes
+          const message = {
+            type: 'notifyParentFrameComplete',
+            source: 'hippie-personalizacao'
+          };
+          
+          // Envia para todos os iframes
+          Array.from(window.frames).forEach(frame => {
+            try {
+              frame.postMessage(message, '*');
+            } catch (error) {
+              console.error('Erro ao enviar mensagem para iframe:', error);
+            }
+          });
+          
+          // Envia também para o window.top para garantir
+          window.top.postMessage(message, '*');
+        } catch (error) {
+          console.error('Erro ao processar pedido:', error);
+          showOverlay("Ocorreu um erro!", "Erro ao processar seu pedido.", !0);
+        }
+      })();
     `, '*');
   }
 };

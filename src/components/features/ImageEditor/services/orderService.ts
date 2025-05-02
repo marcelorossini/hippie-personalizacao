@@ -23,7 +23,8 @@ export const createOrderFormData = (blob: Blob, orderData: OrderData): FormData 
   formData.append('originId', orderData.originId || '');
   formData.append('checkoutId', orderData.checkoutId || '');
   formData.append('userId', orderData.userId || '');
-  formData.append('size', orderData.size);
+  formData.append('size', orderData.size.toString());
   formData.append('color', orderData.color);
+  formData.append('quantity', orderData.quantity.toString());
   return formData;
 };

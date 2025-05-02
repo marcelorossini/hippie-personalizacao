@@ -5,4 +5,5 @@ export interface OrderData {
   userId?: string;
   size: string;
   color: string;
+  quantity: number;
 } 

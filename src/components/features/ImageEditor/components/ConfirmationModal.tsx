@@ -13,6 +13,7 @@ interface ButtonProps {
   label: string;
   onClick: () => void;
   variant?: 'primary' | 'secondary';
+  disabled?: boolean;
 }
 
 interface ConfirmationModalProps {
@@ -38,10 +39,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <button
           key={index}
           onClick={button.onClick}
+          disabled={button.disabled}
           className={`${isDesktop ? 'flex-1' : 'w-full'} py-4 px-6 font-bold rounded-md transition-colors ${
             button.variant === 'primary'
-              ? 'bg-[#74a451] text-white hover:bg-[#5d8a40]'
-              : 'bg-white text-[#74a451] border-2 border-[#74a451] hover:bg-gray-50'
+              ? 'bg-[#74a451] text-white hover:bg-[#5d8a40] disabled:opacity-50 disabled:cursor-not-allowed'
+              : 'bg-white text-[#74a451] border-2 border-[#74a451] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
           }`}
         >
           {button.label}
@@ -53,7 +55,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogOverlay className="backdrop-blur-sm" />
+        <DialogOverlay className="" />
         <DialogContent className="sm:max-w-[600px] bg-white shadow-lg rounded-lg flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center text-gray-800">
