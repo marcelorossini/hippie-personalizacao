@@ -84,7 +84,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
           <ImageGallery onImageSelect={handleImageSelect} />
         </div>
 
-        <div className="mt-4 border-t border-gray-200 bg-white">
+        <div className="mt-auto border-t border-gray-200 bg-white">
           <ExportButton designAreaRef={designAreaRef} layers={layers} />
         </div>
       </div>

@@ -41,6 +41,19 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .export-button-fixed-bottom {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    z-index: 50;
+    background: white;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+    padding: 16px 0 24px 0;
+  }
+}
+
 /* Painel lateral para listar camadas */
 .layers-panel {
   width: 200px;
