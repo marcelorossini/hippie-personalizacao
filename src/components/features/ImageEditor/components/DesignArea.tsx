@@ -65,9 +65,9 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden" style={{ backgroundImage: 'url("./template-background.webp")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      <div className="wrapper-customizada">
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center w-[140%] lg:w-full left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0">
-          <div className="relative h-full w-full flex items-center justify-center overflow-hidden">
+      <div className="wrapper-customizada w-full h-full">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center w-[140%] lg:w-full lg:h-full left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0">
+          <div className="relative h-full max-h-fit w-full flex items-center justify-center overflow-hidden">
             <img
               draggable={false}
               ref={templateImageRef}
