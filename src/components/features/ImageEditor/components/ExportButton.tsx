@@ -192,11 +192,11 @@ const ExportButton: React.FC<ExportButtonProps> = ({ designAreaRef, layers }) =>
         isLoading={isLoading || isGeneratingPreview} 
         message={isGeneratingPreview ? 'Gerando preview...' : 'Adicionando na mochila'} 
       />
-      <div className="flex flex-col lg:flex-row items-end justify-center lg:justify-between gap-4 p-2">
+      <div className="lg:mt-4 flex flex-col lg:flex-row items-end justify-center lg:justify-between gap-4 lg:p-4">
         <div className="flex justify-end w-full">
           <button
             onClick={handleExport}
-            className="w-full text-nowrap border-none bg-[#74a451] h-16 flex items-center justify-center w-56 px-5 font-bold uppercase cursor-pointer text-white text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="lg:w-full text-nowrap border-none bg-[#74a451] h-10 lg:h-16 flex items-center justify-center w-56 px-5 font-bold uppercase cursor-pointer text-white text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? 'PROCESSANDO...' : 'COLOCAR NA MOCHILA'}
