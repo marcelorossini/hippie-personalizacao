@@ -4,16 +4,16 @@ export const updateDesignAreaSize = (
   setTemplateSize: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>
 ) => {
   if (templateImageRef.current && designAreaRef.current) {
+    const templateImg = templateImageRef.current;
     const designArea = designAreaRef.current;
     
     // Obtém as dimensões do container pai
     const containerWidth = designArea.parentElement?.clientWidth || 0;
     const containerHeight = designArea.parentElement?.clientHeight || 0;
-    console.log(containerWidth, containerHeight);
     
     // Calcula a proporção da imagem template
-    const templateAspectRatio = 1;
-
+    const templateAspectRatio = templateImg.naturalWidth / templateImg.naturalHeight;
+    
     // Calcula as dimensões máximas permitidas (80% do container)
     const maxWidth = containerWidth * 0.5;
     const maxHeight = containerHeight * 0.5;
@@ -42,6 +42,7 @@ export const updateDesignAreaSize = (
       newWidth = newHeight * templateAspectRatio;
     }
     
+    // Aplica o ajuste de 85% apenas na largura
     newWidth = newWidth * 0.85;
 
     // Atualiza o tamanho da área de design
