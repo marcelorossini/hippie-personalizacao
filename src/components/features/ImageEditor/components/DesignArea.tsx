@@ -78,7 +78,7 @@ const DesignArea: React.FC<DesignAreaProps> = ({ layers, setLayers, selectedLaye
             <div
               id="design-area"
               ref={designAreaRef}
-              className="design-area absolute overflow-hidden select-none"
+              className="border border-[rgba(0,0,0,0.1)] design-area absolute overflow-hidden select-none"
               style={{
                 width: `${templateSize.width}px`,
                 height: `${templateSize.height}px`,
