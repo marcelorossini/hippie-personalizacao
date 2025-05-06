@@ -11,6 +11,68 @@ export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefOb
   let startX = 0, startY = 0;
   let startContainerWidth = 0;
   let initialLeft = 0, initialTop = 0;
+  let guideLines: { horizontal: HTMLElement | null; vertical: HTMLElement | null } = {
+    horizontal: null,
+    vertical: null
+  };
+
+  const createGuideLine = (isHorizontal: boolean) => {
+    const line = document.createElement('div');
+    line.className = 'guide-line';
+    line.style.position = 'absolute';
+    line.style.backgroundColor = '#3b82f6';
+    line.style.zIndex = '1000';
+    line.style.pointerEvents = 'none';
+    
+    if (isHorizontal) {
+      line.style.width = '100%';
+      line.style.height = '1px';
+      line.style.left = '0';
+    } else {
+      line.style.height = '100%';
+      line.style.width = '1px';
+      line.style.top = '0';
+    }
+    
+    return line;
+  };
+
+  const showGuideLines = (container: HTMLElement, designArea: HTMLElement) => {
+    if (!guideLines.horizontal) {
+      guideLines.horizontal = createGuideLine(true);
+      designArea.appendChild(guideLines.horizontal);
+    }
+    if (!guideLines.vertical) {
+      guideLines.vertical = createGuideLine(false);
+      designArea.appendChild(guideLines.vertical);
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const designAreaRect = designArea.getBoundingClientRect();
+    const containerCenterX = containerRect.left + containerRect.width / 2;
+    const containerCenterY = containerRect.top + containerRect.height / 2;
+    const designAreaCenterX = designAreaRect.left + designAreaRect.width / 2;
+    const designAreaCenterY = designAreaRect.top + designAreaRect.height / 2;
+
+    // Posiciona as linhas de guia
+    if (guideLines.horizontal) {
+      guideLines.horizontal.style.top = `${designAreaCenterY - designAreaRect.top}px`;
+    }
+    if (guideLines.vertical) {
+      guideLines.vertical.style.left = `${designAreaCenterX - designAreaRect.left}px`;
+    }
+  };
+
+  const hideGuideLines = () => {
+    if (guideLines.horizontal) {
+      guideLines.horizontal.remove();
+      guideLines.horizontal = null;
+    }
+    if (guideLines.vertical) {
+      guideLines.vertical.remove();
+      guideLines.vertical = null;
+    }
+  };
 
   const dragStart = (e: MouseEvent | TouchEvent) => {
     if ('touches' in e && e.touches.length > 1) return;
@@ -25,6 +87,10 @@ export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefOb
     const computedStyle = window.getComputedStyle(container);
     initialLeft = parseFloat(computedStyle.left) || 0;
     initialTop = parseFloat(computedStyle.top) || 0;
+
+    if (designAreaRef.current) {
+      showGuideLines(container, designAreaRef.current);
+    }
 
     if (e.type === 'touchstart') {
       document.addEventListener('touchmove', dragMove, { passive: false });
@@ -52,6 +118,8 @@ export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefOb
       const maxTop = designAreaRef.current.offsetHeight - container.offsetHeight - padding;
       newLeft = Math.max(padding, Math.min(newLeft, maxLeft));
       newTop = Math.max(padding, Math.min(newTop, maxTop));
+
+      showGuideLines(container, designAreaRef.current);
     }
     container.style.left = newLeft + 'px';
     container.style.top = newTop + 'px';
@@ -59,6 +127,7 @@ export const makeDraggable = (container: HTMLElement, designAreaRef: React.RefOb
 
   const dragEnd = (e: MouseEvent | TouchEvent) => {
     isDragging = false;
+    hideGuideLines();
     if (e.type === 'touchend') {
       document.removeEventListener('touchmove', dragMove);
       document.removeEventListener('touchend', dragEnd);
